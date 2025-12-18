@@ -2,267 +2,303 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INTEGRA MOBILE CHECKLIST v6</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>INTEGRA CHECKLIST V10</title>
     <style>
-        /* --- ALAPOK (MOBILRA OPTIMALIZÁLVA) --- */
-        body {
-            background-color: #121212;
-            color: #ffffff;
-            font-family: sans-serif;
-            margin: 0;
-            padding: 15px;
-            padding-bottom: 100px; /* Hely a gombnak */
-            line-height: 1.5;
+        /* --- ALAP STÍLUSOK (SÖTÉT MÓD) --- */
+        :root {
+            --bg: #121212;
+            --card: #1e1e1e;
+            --primary: #00bcd4;  /* Neon Kék */
+            --success: #00e676;  /* Neon Zöld */
+            --danger: #ff5252;   /* Neon Piros */
+            --text: #ffffff;
         }
 
-        /* --- STÍLUSOK --- */
-        h1 { color: #00bcd4; font-size: 1.2rem; margin: 0 0 5px 0; text-transform: uppercase; }
-        .subtitle { color: #888; font-size: 0.8rem; margin-bottom: 15px; display: block; }
-        
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            padding-bottom: 120px; /* Hely a lebegő gombnak */
+        }
+
+        /* --- KÁRTYÁK --- */
         .card {
-            background: #1e1e1e;
+            background: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
             border: 1px solid #333;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px; /* Térköz a kártyák között */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        h1.app-title { 
+            color: var(--primary); margin: 0; 
+            text-transform: uppercase; font-size: 1.4rem; letter-spacing: 1px;
+        }
+        .subtitle { 
+            color: #888; font-size: 0.9rem; margin-bottom: 20px; 
+            display: block; border-bottom: 1px solid #333; padding-bottom: 10px; 
         }
 
         /* --- BEVITELI MEZŐK --- */
-        label { display: block; color: #00bcd4; font-size: 0.8rem; font-weight: bold; margin-bottom: 5px; }
-        input[type="text"] {
-            width: 100%; padding: 10px; background: #2c2c2c; border: 1px solid #444; 
-            color: #fff; border-radius: 5px; box-sizing: border-box; font-size: 1rem;
-            margin-bottom: 15px;
+        .input-group { margin-bottom: 15px; }
+        .input-group label { 
+            color: var(--primary); font-size: 0.8rem; 
+            font-weight: bold; display: block; margin-bottom: 5px; 
+        }
+        .input-group input { 
+            background: #2c2c2c; border: 1px solid #444; color: #fff; 
+            width: 100%; padding: 12px; border-radius: 6px; 
+            font-size: 1rem; box-sizing: border-box; 
         }
 
-        /* --- SZEKCIÓ CÍMEK --- */
+        /* --- SZEKCIÓK --- */
         .section-header {
-            background: #252525;
-            color: #00bcd4;
-            padding: 12px;
-            font-weight: bold;
-            margin-top: 20px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            border-left: 5px solid #00bcd4;
-            cursor: pointer;
-            display: flex; justify-content: space-between;
+            background: #252525; color: var(--primary); padding: 15px; 
+            font-weight: bold; margin-top: 30px; 
+            border-left: 4px solid var(--primary); border-radius: 8px; 
+            cursor: pointer; display: flex; justify-content: space-between; align-items: center;
         }
-        
-        .section-content { display: none; }
+        .section-content { display: none; margin-top: 10px; }
         .section-content.active { display: block; }
 
-        /* --- CHECKLIST ELEMEK --- */
+        /* --- LISTA ELEMEK --- */
         .item-box {
-            background: #181818;
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
+            background: var(--card); padding: 15px; margin-bottom: 15px; 
+            border-radius: 8px; border: 1px solid #333; position: relative;
         }
-        
-        /* Státusz jelölés színekkel */
-        .item-box[data-status="OK"] { border-left: 5px solid #00e676; }
-        .item-box[data-status="NOK"] { border-left: 5px solid #ff5252; }
+        .item-box[data-status="OK"] { border-left: 6px solid var(--success); }
+        .item-box[data-status="NOK"] { border-left: 6px solid var(--danger); }
 
         .id-tag { 
-            background: #333; color: #00bcd4; padding: 2px 6px; 
-            font-size: 0.75rem; font-weight: bold; border-radius: 4px; 
-            display: inline-block; margin-bottom: 8px;
+            background: #333; color: var(--primary); padding: 3px 6px; 
+            font-size: 0.75rem; border-radius: 4px; font-weight: bold; 
         }
-        
-        .q-text { font-size: 1rem; margin-bottom: 15px; font-weight: 500; }
+        .q-text { font-size: 1.05rem; margin: 12px 0; line-height: 1.4; font-weight: 500; }
 
         /* --- GOMBOK --- */
-        .btn-row { display: flex; gap: 8px; margin-bottom: 10px; }
-        
-        button {
+        .btn-row { display: flex; gap: 10px; margin-top: 15px; }
+        button { 
             flex: 1; padding: 12px; border: none; border-radius: 6px; 
-            font-weight: bold; font-size: 0.9rem; cursor: pointer; color: #fff;
+            font-weight: bold; cursor: pointer; color: #fff; font-size: 0.9rem;
+            transition: opacity 0.2s;
         }
-
-        .btn-guide { flex: 0 0 40px; background: #333; color: #00bcd4; font-size: 1.2rem; }
+        .btn-guide { flex: 0 0 50px; background: #333; color: var(--primary); font-size: 1.2rem; }
         .btn-ok { background: #1b5e20; opacity: 0.6; }
         .btn-nok { background: #b71c1c; opacity: 0.6; }
+        
+        .btn-ok.active { background: var(--success); color: #000; opacity: 1; box-shadow: 0 0 10px rgba(0,230,118,0.4); }
+        .btn-nok.active { background: var(--danger); color: #fff; opacity: 1; box-shadow: 0 0 10px rgba(255,82,82,0.4); }
 
-        /* Aktív gombok */
-        .btn-ok.active { background: #00e676; color: #000; opacity: 1; box-shadow: 0 0 10px rgba(0,230,118,0.5); }
-        .btn-nok.active { background: #ff5252; color: #fff; opacity: 1; box-shadow: 0 0 10px rgba(255,82,82,0.5); }
-
-        /* --- LEÍRÁS & FOTÓ (REJTETT) --- */
+        /* --- RÉSZLETEK (Lenyíló) --- */
         .details { display: none; margin-top: 15px; border-top: 1px dashed #444; padding-top: 15px; }
-        
-        .guide-text { 
-            background: rgba(0, 188, 212, 0.15); color: #ddd; 
-            padding: 10px; border-radius: 5px; font-size: 0.9rem; margin-bottom: 10px; 
+        .guide-box { 
+            background: rgba(0,188,212,0.1); color: #ddd; padding: 12px; 
+            border-radius: 6px; font-size: 0.9rem; margin-bottom: 15px; 
+            white-space: pre-line; border-left: 2px solid var(--primary);
         }
-
-        textarea {
-            width: 100%; background: #000; color: #fff; border: 1px solid #444; 
-            padding: 10px; border-radius: 5px; box-sizing: border-box; min-height: 60px;
+        textarea { 
+            width: 100%; background: #111; color: #fff; border: 1px solid #444; 
+            padding: 10px; border-radius: 6px; box-sizing: border-box; min-height: 60px; font-family: inherit;
         }
-
-        .file-upload {
-            display: block; margin-top: 10px; background: #333; color: #00bcd4; 
-            padding: 10px; text-align: center; border-radius: 5px; border: 1px dashed #00bcd4;
+        .file-upload { 
+            display: block; background: #333; color: var(--primary); 
+            padding: 12px; text-align: center; margin-top: 10px; 
+            border-radius: 6px; border: 1px dashed #555; cursor: pointer;
         }
-        
-        .img-preview { width: 100%; margin-top: 10px; display: none; border-radius: 5px; border: 1px solid #555; }
+        .img-preview { width: 100%; max-height: 250px; object-fit: contain; margin-top: 10px; display: none; border: 1px solid #444; border-radius: 4px; }
 
-        /* --- LEBEGŐ GOMB (FIX) --- */
+        /* --- FIX LÁBLÉC --- */
         .floating-footer {
             position: fixed; bottom: 0; left: 0; right: 0; 
-            background: #1e1e1e; padding: 15px; border-top: 1px solid #333; 
-            display: flex; gap: 10px; align-items: center; z-index: 999;
+            background: rgba(30,30,30,0.95); backdrop-filter: blur(5px);
+            border-top: 2px solid var(--primary); padding: 15px; 
+            display: flex; align-items: center; justify-content: space-between; 
+            z-index: 999;
         }
-        
-        .save-btn {
-            background: #00bcd4; color: #000; border: none; padding: 15px; 
-            width: 100%; font-size: 1.1rem; font-weight: bold; border-radius: 50px;
+        .score { font-size: 1.5rem; color: var(--primary); font-weight: bold; margin-left: 20px; }
+        .save-btn { 
+            background: var(--primary); color: #000; padding: 12px 30px; 
+            border-radius: 30px; font-weight: bold; margin-right: 20px; border: none; font-size: 1rem;
         }
 
-        .score-display { font-size: 1.5rem; font-weight: bold; color: #00bcd4; min-width: 60px; text-align: center; }
+        /* --- NYOMTATÁS / PDF SPECIALISTA STÍLUSOK --- */
+        #print-header { display: none; }
 
-        /* --- NYOMTATÁS (PDF EXPORT) STÍLUSOK --- */
         @media print {
-            body { background: #fff; color: #000; padding: 0; margin: 0; }
-            .card, .item-box { border: none; border-bottom: 1px solid #ccc; margin: 0; padding: 10px 0; page-break-inside: avoid; background: #fff; }
-            .section-header { background: #eee; color: #000; border: none; border-bottom: 2px solid #000; margin-top: 20px; }
-            .section-content { display: block !important; } /* Mindent kinyit */
-            h1 { color: #000; }
-            label { color: #000; }
-            input[type="text"], textarea { border: 1px solid #ccc; background: #fff; color: #000; }
+            @page { margin: 15mm; size: A4; }
             
-            /* Eltüntetjük a felesleges gombokat nyomtatáskor */
-            .btn-guide, .file-upload, .floating-footer { display: none !important; }
-            
-            /* Csak a választott státusz maradjon látható, szövegesen */
-            .btn-row { justify-content: flex-start; }
-            button { display: none; }
-            button.active { display: inline-block; border: 1px solid #000; background: #fff !important; color: #000 !important; opacity: 1; padding: 5px 10px; width: auto; flex: none; }
-            
-            .details { display: block !important; border: none; } /* Kommentek látszódjanak */
-            .guide-text { display: none; } /* Útmutató szöveg nem kell a PDF-re */
-            .img-preview { max-width: 300px; display: block; }
-        }
+            body { 
+                background: #fff; color: #000; padding: 0; margin: 0; 
+                font-family: Arial, sans-serif; font-size: 11px;
+            }
 
+            /* Elemek elrejtése */
+            .floating-footer, .btn-guide, .file-upload, .btn-row button { display: none !important; }
+            .subtitle, .section-header span:last-child { display: none; }
+            .input-group { display: none; } /* Az inputok helyett a fejlécet használjuk */
+            .card { border: none; box-shadow: none; margin: 0; padding: 0; background: none; color: #000; }
+
+            /* Fejléc megjelenítése */
+            #print-header { 
+                display: block; border-bottom: 2px solid #000; 
+                margin-bottom: 20px; padding-bottom: 10px; 
+            }
+            #print-header h1 { font-size: 18px; color: #000; margin-bottom: 10px; text-align: center; }
+            .meta-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; border-bottom: 1px solid #eee; padding-bottom: 2px;}
+
+            /* Szekciók */
+            .section-header { 
+                background: #eee !important; color: #000 !important; 
+                margin: 20px 0 10px 0 !important; padding: 5px 10px !important;
+                border: none !important; border-bottom: 1px solid #000 !important; 
+                border-radius: 0 !important; font-size: 12px !important; 
+                page-break-after: avoid; 
+            }
+            .section-content { display: block !important; margin: 0; }
+
+            /* Lista elemek */
+            .item-box {
+                border: none; border-bottom: 1px dotted #ccc; 
+                margin: 0; padding: 10px 0; 
+                border-radius: 0; background: none; 
+                page-break-inside: avoid; /* EGYBEN TARTJA A BLOKKOT */
+            }
+
+            .id-tag { background: none; color: #000; border: 1px solid #000; padding: 1px 4px; font-size: 10px; }
+            .q-text { margin: 5px 0; font-weight: bold; font-size: 11px; color: #000; }
+
+            /* Státusz kiírása */
+            .item-box::after {
+                display: block; float: right; font-weight: bold; font-size: 11px; margin-top: -30px;
+            }
+            .item-box[data-status="OK"]::after { content: "✔ MEGFELELŐ"; color: green; }
+            .item-box[data-status="NOK"]::after { content: "✖ HIBÁS"; color: red; }
+            .item-box:not([data-status])::after { content: "○ ÜRES"; color: #999; }
+
+            /* Részletek */
+            .guide-box { display: none; }
+            .details { display: block !important; border: none; margin: 0; padding: 0; }
+            textarea { 
+                border: none; background: none; color: #000; padding: 0; 
+                font-style: italic; min-height: auto; font-size: 11px;
+                display: block; width: 100%; resize: none;
+            }
+            .img-preview { display: block; max-height: 150px; max-width: 200px; border: 1px solid #ccc; margin-top: 5px; }
+        }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h1>Integra Checklist v6</h1>
-    <span class="subtitle">Mobile Optimalizált Verzió</span>
-    
-    <label>BERENDEZÉS NEVE</label>
-    <input type="text" id="devName" placeholder="pl. OP10">
-    
-    <label>ELLENŐR NEVE</label>
-    <input type="text" id="opName" placeholder="Név...">
+<div id="print-header">
+    <h1>INTEGRA ELLENŐRZÉSI JEGYZŐKÖNYV</h1>
+    <div class="meta-row">
+        <span><strong>Berendezés:</strong> <span id="p-dev">-</span></span>
+        <span><strong>Dátum:</strong> <span id="p-date">-</span></span>
+    </div>
+    <div class="meta-row">
+        <span><strong>Ellenőr:</strong> <span id="p-op">-</span></span>
+        <span><strong>Eredmény:</strong> <span id="p-score">0%</span></span>
+    </div>
 </div>
 
-<div id="checklist-root"></div>
+<div class="card">
+    <h1 class="app-title">Integra Checklist v10</h1>
+    <span class="subtitle">Stabil Verzió (Hivatalos Dokumentum)</span>
+    
+    <div class="input-group">
+        <label>BERENDEZÉS NEVE</label>
+        <input type="text" id="devName" placeholder="pl. OP10" oninput="syncData()">
+    </div>
+    <div class="input-group">
+        <label>ELLENŐR NEVE</label>
+        <input type="text" id="opName" placeholder="Név..." oninput="syncData()">
+    </div>
+</div>
+
+<div id="root"></div>
 
 <div class="floating-footer">
-    <div class="score-display" id="score">0%</div>
-    <button class="save-btn" onclick="exportPDF()">PDF MENTÉSE (NYOMTATÁS)</button>
+    <div class="score" id="scoreDisplay">0%</div>
+    <button class="save-btn" onclick="savePDF()">PDF MENTÉSE</button>
 </div>
 
 <script>
-    // --- ADATBÁZIS (Minden pont benne van) ---
+    // --- ADATBÁZIS (A PONTOSÍTOTT SZÖVEGEKKEL) ---
     const data = [
-        {
-            cat: "1.1.0 HÁLÓZAT",
-            items: [
-                { id: "1.1.1", t: "Hálózati telepítés előírás szerinti?", g: "PC-k az utolsó résztvevők? Windows PC-k ugyanabban a 'Pull'-ban lévő E/A modulhoz csatlakoznak?" },
-                { id: "1.1.2", t: "Gépnév egyedi és egyeztetve?", g: "Egyértelmű elnevezés." },
-                { id: "1.1.3", t: "Ondeso tool futott?", g: "Domain, hálózat beállítva?" }
-            ]
-        },
-        {
-            cat: "1.2.0 STANDARD SZOFTVER",
-            items: [
-                { id: "1.2.1", t: "Image Verzió aktuális?", g: "Win10 Ent 2019 LTSC, BluePC Image ZAS." },
-                { id: "1.2.2", t: "TIA Portal verzió megfelelő?", g: "V16 UB vagy aktuális." },
-                { id: "1.2.3", t: "Safety verzió megfelelő?", g: "Safety komponensek verziója." },
-                { id: "1.2.4", t: "Integra Designer verzió?", g: "System Manager -> Update range." }
-            ]
-        },
-        {
-            cat: "1.3.0 - 1.4.0 RENDSZER",
-            items: [
-                { id: "1.3.1", t: "PC címkézés & Visu felépítés?", g: "Pult jelölés fizikai címkével." },
-                { id: "1.4.1", t: "Rendszerdiagnosztika hiba nélkül?", g: "Nincs piros az Anlagendiagnose-ban." },
-                { id: "1.4.2", t: "IntegraCheck OK?", g: "Minden zöld a menüben." },
-                { id: "1.4.3", t: "Mozgásképek rendben?", g: "Irányok, csoportosítás jó?" },
-                { id: "1.4.4", t: "Interfész képek rendben?", g: "Kapcsolódások láthatóak?" },
-                { id: "1.4.5", t: "Sablonok eredetiek?", g: "SystemTemplates.zip nem módosult." },
-                { id: "1.4.6", t: "Scriptek dokumentálva?", g: "Van egyedi script?" },
-                { id: "1.4.7", t: "Nyelv beállítva?", g: "Projektálás előtt." }
-            ]
-        },
-        {
-            cat: "1.6.0 KIEGÉSZÍTÉSEK",
-            items: [
-                { id: "1.6.1", t: "Mintaprojektek betartva?", g: "RB, MO standardok." },
-                { id: "1.6.2", t: "Tech paraméterek jó helyen?", g: "Megfelelő mappastruktúra." },
-                { id: "1.6.3", t: "IntegraShell konfiguráció?", g: "Tiltja a Windows hozzáférést?" },
-                { id: "1.6.4", t: "EKM kapcsolat?", g: "Update jelzés." },
-                { id: "1.6.5", t: "isiSave beállítva?", g: "Archiválás működik." },
-                { id: "1.6.6", t: "Index-Szerver OK?", g: "Online státusz." },
-                { id: "1.6.8", t: "SIS Log tiszta?", g: "Nincs hiba a logban." },
-                { id: "1.6.9", t: "Mappastruktúra OK?", g: "D:/CMWProjects/..." },
-                { id: "1.6.10", t: "Szemét törölve?", g: "Csak 1 TIA projekt van." },
-                { id: "1.6.11", t: "Vírusirtó frissül?", g: "Aktív védelem." }
-            ]
-        },
-        {
-            cat: "2.1.0 PLC (SPS)",
-            items: [
-                { id: "2.1.1", t: "Minden PLC terület látszik?", g: "Választó képernyőn." },
-                { id: "2.1.2", t: "Minden területnek van képe?", g: "Megnyitható." },
-                { id: "2.1.3", t: "Full HD felbontás?", g: "1920x1080." },
-                { id: "2.1.4", t: "Calibri 10 Bold?", g: "Szabvány betűtípus." },
-                { id: "2.1.5", t: "Pult 99 (Nyers) ablak?", g: "Helyettesítő kép." },
-                { id: "2.1.6", t: "PNG átlátszó képek?", g: "Max 100KB méret." }
-            ]
-        },
-        {
-            cat: "2.2.0 - 2.6.0 KÉPERNYŐK",
-            items: [
-                { id: "2.2.1", t: "Áttekintő képek OK?", g: "Guideline szerint." },
-                { id: "2.3.1", t: "Pult képek OK?", g: "Guideline szerint." },
-                { id: "2.4.1", t: "Állomás képek OK?", g: "Guideline szerint." },
-                { id: "2.5.1", t: "Speciális funkciók OK?", g: "Guideline szerint." },
-                { id: "2.5.4", t: "Robot áttekintők OK?", g: "Guideline szerint." },
-                { id: "2.6.1", t: "Nincs Station/Pult elem?", g: "Dupla hiba elkerülése." },
-                { id: "2.6.2", t: "Vészleállító (SonderBit)?", g: "Nem a listából, hanem SonderBit!" },
-                { id: "2.6.3", t: "Részletképek OK?", g: "Guideline szerint." }
-            ]
-        }
+        { cat: "1.1.0 HÁLÓZAT", items: [
+            { id: "1.1.1", t: "Hálózati telepítés előírás szerinti?", g: "Online topológiát megnyitni és ellenőrizni, hogy a PC-k az utolsó résztvevők-e a hálózaton. KP32Futár" },
+            { id: "1.1.2", t: "Gépnév egyedi és egyeztetve?", g: "Gépnév egyeztetve és egyértelmű" },
+            { id: "1.1.3", t: "Ondeso tool futott?", g: "Ondeso tool rendben fut rajta és a hálózati és a számítógépnév, domainba rendezés vagy szerver system be van állítva\nA mi image-inket használják a PC-k, de végig tudjuk kérdezni, ha szükséges" }
+        ]},
+        { cat: "1.2.0 SZOFTVER", items: [
+            { id: "1.2.1", t: "Image Verzió aktuális?", g: "OS-Info-t elindítani\nWindows 10 Enterprise 2019 LTSC\nBluePC Image ZAS - Win10 x64 LTSC 2019 EBF 3.8\n\nVisu kis pultok:\nWindows 10 Enterprise 2019 LTSC\nBluePC Image ZAS - Win10 x64 LTSC 2019 HVO62 3.3" },
+            { id: "1.2.2", t: "TIA Portal verzió megfelelő?", g: "TIA verzió ellenőrzés V16 UB" },
+            { id: "1.2.3", t: "Safety verzió megfelelő?", g: "TIA verzió ellenőrzés" },
+            { id: "1.2.4", t: "Integra Designer verzió?", g: "D:\\integra\\System\\SIS\\IntegraDesignerPro.exe verziószáma\n6.9.7.0 vagy\nIntegra System Manager-ben (Verwaltung) leellenőrizni a gépeket:\nOnline/System/Update range" }
+        ]},
+        { cat: "1.3.0 HARDWARE", items: [
+             { id: "1.3.1", t: "PC feliratozva?", g: "Pult jelölés (Nyomtatva vagy gravírozva)\nHelyileg ellenőrizni" }
+        ]},
+        { cat: "1.4.0 RENDSZER", items: [
+            { id: "1.4.1", t: "Rendszerdiagnosztika hiba nélkül?", g: "Integra System Manager-ben (Verwaltung) test/frissíteni a gépeket.\nNincs piros állapot" },
+            { id: "1.4.2", t: "IntegraCheck OK?", g: "VMC, Vizualizáció:\nMenü/IntegraCheck" },
+            { id: "1.4.3", t: "Mozgásképek rendben?", g: "Minden Visu-ban ellenőrizni a Mozgás képernyőket.\nIrányok megfelelőek, jól csoportosítottak a mozgások\nAz egyes pultokról csak a belátható elemek mozgathatók" },
+            { id: "1.4.4", t: "Interfész képek rendben?", g: "Mozgás képernyő ikonja mellett van a menüpont (kapcsolódási pont)\nNem minden területnek van. Önálló Anlage-nek nincs (ami nem ad át, vagy nem vesz el más sortól alapanyagot)." },
+            { id: "1.4.5", t: "Designer Templates OK?", g: "Integra System Manager-ben (Verwaltung) leellenőrizni a gépeket.\nHa a System zöld, akkor nem változtattak lokálisan az .ini fájlokon" },
+            { id: "1.4.6", t: "Scriptek dokumentálva?", g: "idPro projektet letölteni a Versionierung-gal és F12-vel ellenőrizni az egyes képernyőkön, hogy van-e egyedi script. Ha van, akkor ahhoz dokumentáció is kell, hogy tartozzon (IDS fájlok)" },
+            { id: "1.4.7", t: "Nyelv beállítva?", g: "Ellenőrizni a nyelvváltást a Visu-ban" }
+        ]},
+        { cat: "1.6.0 KIEGÉSZÍTÉSEK", items: [
+            { id: "1.6.1", t: "Mintaprojektek betartva?", g: "Ellenőrizni a mintaprojektek (RB, MO, FT) előírásait." },
+            { id: "1.6.2", t: "Tech paraméterek jó helyen?", g: "Ellenőrizni a D:\\CMWProjekt mappát" },
+            { id: "1.6.3", t: "IntegraShell konfiguráció?", g: "Ha jól működik a Shell, akkor, ha kijelentkezünk, akkor tiltja a programok futtatását, ablakváltást, stb." },
+            { id: "1.6.4", t: "EKM kapcsolat?", g: "Szerverről kapja. Ha az Update jó, akkor az EKM-nek is jónak kell lennie" },
+            { id: "1.6.5", t: "isiSave beállítva?", g: "vagy VisualisierungInfo -> EKB logo a láblécben\nisiSave programban (archivierung) ellenőrizni, hogy van-e automatikus mentés a PC-kre" },
+            { id: "1.6.6", t: "Index-Szerver OK?", g: "Ha a Systemmanager-ben látjuk Online a PC-ket, akkor jó az index-szerver beállítása\nA topológiában nincs az index-szerver számára ismeretlen gép (nincs olyan gép az online topológiában, ami nincs a system manager listájában)" },
+            { id: "1.6.8", t: "SIS Log tiszta?", g: "Trend-ben (IntegraView Admin) az Admin/Profile -> SPS/Bearbeiten alatt a Bearbeiten-t ellenőrizni\nD:\\integra\\System\\Logs\\SisServer.csv-t megnyitni.\nEllenőrizni, hogy tartalmaz-e log-okat" },
+            { id: "1.6.9", t: "Mappastruktúra OK?", g: "a CMWProjekt mappa felépítése az előírás szerinti" },
+            { id: "1.6.10", t: "Szemét törölve?", g: "Nincs más TIA projekt a mappában" },
+            { id: "1.6.11", t: "Vírusirtó frissül?", g: "Antivírus szoftver telepítve" }
+        ]},
+        { cat: "2.1.0 PLC (SPS)", items: [
+            { id: "2.1.1", t: "Minden PLC terület látszik?", g: "Minden PLC terület megtalálható a Terület választó képernyőn?" },
+            { id: "2.1.2", t: "Minden területnek van vizuja?", g: "Van minden PLC (SPS) területhez megtervezett vizualizációs kép?" },
+            { id: "2.1.3", t: "Full HD felbontás?", g: "Az integra Projekttervezőben a Full HD felbontás lett kiválasztva?" },
+            { id: "2.1.4", t: "Calibri 10 Bold?", g: "Az összes elemhez a Calibri betűtípus, félkövér, 10-es méret és a 'balra igazítás' lett-e használva?" },
+            { id: "2.1.5", t: "Pult 99 (Nyers) ablak?", g: "A 99-es pultterület (Rohbau) az áttekintő képet a helyettesítő ablak funkcióval jelenítették meg?" },
+            { id: "2.1.6", t: "PNG átlátszó képek?", g: "A képek megjelenítéséhez PNG formátum került kiválasztásra, legfeljebb kb. 100 KB-os célzott fájlmérettel? Előnyben kell részesíteni a CAD-rajzokat, például funkcióelrendezési tervekből, szerszámáttekintőkből stb" }
+        ]},
+        { cat: "2.2.0 KÉPERNYŐK", items: [
+            { id: "2.2.1", t: "Áttekintő képek OK?", g: "Az áttekintő képernyők a szabályzat (irányelv) szerint lettek megtervezve?" },
+            { id: "2.3.1", t: "Pult képek OK?", g: "A vezérlőpult területi képernyők az irányelv szerint lettek megtervezve?" },
+            { id: "2.4.1", t: "Állomás képek OK?", g: "A vezérlőpult részletező képernyők az irányelv szerint lettek megtervezve?" },
+            { id: "2.5.1", t: "Speciális funkciók OK?", g: "A speciális funkciók az irányelv szerint lettek megtervezve?" },
+            { id: "2.5.4", t: "Robot áttekintők OK?", g: "A robotok áttekintő képernyői az irányelv szerint lettek megtervezve?" },
+            { id: "2.6.1", t: "Nincs Station/Pult elem?", g: "Nem kerültek alkalmazásra magasabb szintű elemek, mint például az állomás vagy a vezérlőpult, hogy elkerüljék a többszörös hibajelzéseket." },
+            { id: "2.6.2", t: "Vészleállító (SonderBit)?", g: "Nem lett használva vészleállító elem a választólistából. Ehhez a funkcióhoz a részletes képen a sablon található: 'DYN_GEN_SonderBit_Endlage_Absolut' vagy 'DYN_GEN_SonderBit_LED_Absolut'" },
+            { id: "2.6.3", t: "Részletképek OK?", g: "A stáció részletes képernyő az irányelv szerint lettek megtervezve?" }
+        ]}
     ];
 
-    // --- RENDERELÉS ---
-    const root = document.getElementById('checklist-root');
+    const root = document.getElementById('root');
 
     function render() {
-        data.forEach((section, index) => {
-            // Szekció Fejléc
+        data.forEach((sect, idx) => {
             const h = document.createElement('div');
             h.className = 'section-header';
-            h.innerHTML = `<span>${section.cat}</span> <span>▼</span>`;
-            // Mobilon könnyebb, ha az első kivételével csukva vannak, de nyithatóak
-            h.onclick = () => { 
-                document.getElementById(`sec-${index}`).classList.toggle('active'); 
-            };
-
+            h.innerHTML = `<span>${sect.cat}</span> <span>▼</span>`;
+            h.onclick = () => document.getElementById(`sec-${idx}`).classList.toggle('active');
+            
             const c = document.createElement('div');
-            c.id = `sec-${index}`;
             c.className = 'section-content';
-            if(index === 0) c.classList.add('active'); // Csak az első nyitva
+            c.id = `sec-${idx}`;
+            if(idx === 0) c.classList.add('active'); // Csak az első nyitva mobilon
 
-            section.items.forEach(item => {
+            sect.items.forEach(item => {
                 const uid = item.id.replace(/\./g, '_');
                 c.innerHTML += `
                     <div class="item-box" id="box-${uid}">
@@ -271,87 +307,84 @@
                         
                         <div class="btn-row">
                             <button class="btn-guide" onclick="toggleDetails('${uid}')">?</button>
-                            <button class="btn-ok" onclick="setState('${uid}', 'OK')">MEGFELELŐ</button>
-                            <button class="btn-nok" onclick="setState('${uid}', 'NOK')">HIBÁS</button>
+                            <button class="btn-ok" onclick="setStatus('${uid}', 'OK')">OK</button>
+                            <button class="btn-nok" onclick="setStatus('${uid}', 'NOK')">NOK</button>
                         </div>
 
                         <div class="details" id="det-${uid}">
-                            <div class="guide-text">💡 ${item.g}</div>
-                            <textarea placeholder="Megjegyzés..." id="com-${uid}"></textarea>
+                            <div class="guide-box">${item.g}</div>
+                            <textarea placeholder="Megjegyzés írása..." id="com-${uid}"></textarea>
                             <label class="file-upload">
-                                📷 Fotó csatolása
-                                <input type="file" accept="image/*" style="display:none" onchange="loadFile(event, '${uid}')">
+                                📷 Kép csatolása
+                                <input type="file" accept="image/*" style="display:none" onchange="loadImg(event, '${uid}')">
                             </label>
                             <img id="img-${uid}" class="img-preview">
                         </div>
                     </div>
                 `;
             });
-
             root.appendChild(h);
             root.appendChild(c);
         });
+        document.getElementById('p-date').innerText = new Date().toLocaleString();
     }
 
-    // --- FUNKCIÓK ---
     function toggleDetails(uid) {
         const el = document.getElementById(`det-${uid}`);
         el.style.display = (el.style.display === 'block') ? 'none' : 'block';
     }
 
-    function setState(uid, status) {
+    function setStatus(uid, s) {
         const box = document.getElementById(`box-${uid}`);
         const btns = box.querySelectorAll('.btn-row button');
         
-        // Reset gombok
         btns[1].classList.remove('active');
         btns[2].classList.remove('active');
 
-        box.setAttribute('data-status', status);
+        box.setAttribute('data-status', s);
 
-        if(status === 'OK') {
+        if(s === 'OK') {
             btns[1].classList.add('active');
         } else {
             btns[2].classList.add('active');
-            // Hiba esetén automatikusan nyíljon le a komment szekció
             document.getElementById(`det-${uid}`).style.display = 'block';
         }
-        calcScore();
+        calc();
     }
 
-    function loadFile(event, uid) {
+    function loadImg(e, uid) {
         const img = document.getElementById(`img-${uid}`);
-        img.src = URL.createObjectURL(event.target.files[0]);
+        img.src = URL.createObjectURL(e.target.files[0]);
         img.style.display = 'block';
-        // Ha fotót tölt fel, nyissuk meg a panelt biztos ami biztos
         document.getElementById(`det-${uid}`).style.display = 'block';
     }
 
-    function calcScore() {
-        const total = document.querySelectorAll('.item-box').length;
+    function calc() {
+        const all = document.querySelectorAll('.item-box').length;
         const ok = document.querySelectorAll('.item-box[data-status="OK"]').length;
-        const pct = Math.round((ok / total) * 100);
-        document.getElementById('score').innerText = pct + "%";
+        const pct = Math.round((ok/all)*100);
+        document.getElementById('scoreDisplay').innerText = pct + "%";
+        document.getElementById('p-score').innerText = pct + "%";
     }
 
-    // --- EXPORT FUNKCIÓ (NATIVE PRINT) ---
-    function exportPDF() {
-        const dName = document.getElementById('devName').value;
-        const oName = document.getElementById('opName').value;
-        
-        if(!dName) { alert("Kérlek írd be a berendezés nevét!"); return; }
+    function syncData() {
+        document.getElementById('p-dev').innerText = document.getElementById('devName').value;
+        document.getElementById('p-op').innerText = document.getElementById('opName').value;
+    }
 
-        document.title = dName + "_Integra_Jelentes"; // Ez lesz a fájlnév
+    function savePDF() {
+        const name = document.getElementById('devName').value;
+        if(!name) { alert("Add meg a gép nevét!"); return; }
+        document.title = name + "_Jegyzokonyv";
+        syncData();
         
-        // Figyelmeztetés a mentés menetéről
-        alert("A PDF mentéséhez a következő ablakban válaszd a 'Mentés PDF-ként' vagy a 'Nyomtatás' opciót!");
+        // TRÜKK: Nyomtatás előtt kinyitjuk az összes szekciót, hogy minden látszódjon
+        document.querySelectorAll('.section-content').forEach(el => el.classList.add('active'));
         
         window.print();
     }
 
-    // Indítás
     render();
-
 </script>
 
 </body>
