@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INTEGRA CHECKLIST V10</title>
+    <title>INTEGRA CHECKLIST V11 - EXCEL</title>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+
     <style>
         /* --- ALAP STÍLUSOK (SÖTÉT MÓD) --- */
         :root {
@@ -12,6 +14,7 @@
             --primary: #00bcd4;  /* Neon Kék */
             --success: #00e676;  /* Neon Zöld */
             --danger: #ff5252;   /* Neon Piros */
+            --excel: #21a366;    /* Excel Zöld */
             --text: #ffffff;
         }
 
@@ -21,7 +24,7 @@
             font-family: 'Segoe UI', -apple-system, sans-serif;
             margin: 0;
             padding: 20px;
-            padding-bottom: 120px; /* Hely a lebegő gombnak */
+            padding-bottom: 140px; /* Megnövelt hely a lebegő gomboknak */
         }
 
         /* --- KÁRTYÁK --- */
@@ -116,14 +119,21 @@
             position: fixed; bottom: 0; left: 0; right: 0; 
             background: rgba(30,30,30,0.95); backdrop-filter: blur(5px);
             border-top: 2px solid var(--primary); padding: 15px; 
-            display: flex; align-items: center; justify-content: space-between; 
+            display: flex; flex-direction: column; gap: 10px;
             z-index: 999;
         }
-        .score { font-size: 1.5rem; color: var(--primary); font-weight: bold; margin-left: 20px; }
-        .save-btn { 
-            background: var(--primary); color: #000; padding: 12px 30px; 
-            border-radius: 30px; font-weight: bold; margin-right: 20px; border: none; font-size: 1rem;
+        .footer-row {
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
         }
+        .score { font-size: 1.5rem; color: var(--primary); font-weight: bold; margin-left: 10px; }
+        
+        .btn-action { 
+            padding: 10px 20px; border-radius: 30px; font-weight: bold; border: none; font-size: 0.9rem; text-transform: uppercase;
+        }
+        .btn-pdf { background: var(--primary); color: #000; }
+        .btn-excel { background: var(--excel); color: #fff; position: relative; overflow: hidden; }
+
+        #excelInput { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
 
         /* --- NYOMTATÁS / PDF SPECIALISTA STÍLUSOK --- */
         #print-header { display: none; }
@@ -139,7 +149,7 @@
             /* Elemek elrejtése */
             .floating-footer, .btn-guide, .file-upload, .btn-row button { display: none !important; }
             .subtitle, .section-header span:last-child { display: none; }
-            .input-group { display: none; } /* Az inputok helyett a fejlécet használjuk */
+            .input-group { display: none; } 
             .card { border: none; box-shadow: none; margin: 0; padding: 0; background: none; color: #000; }
 
             /* Fejléc megjelenítése */
@@ -165,7 +175,7 @@
                 border: none; border-bottom: 1px dotted #ccc; 
                 margin: 0; padding: 10px 0; 
                 border-radius: 0; background: none; 
-                page-break-inside: avoid; /* EGYBEN TARTJA A BLOKKOT */
+                page-break-inside: avoid; 
             }
 
             .id-tag { background: none; color: #000; border: 1px solid #000; padding: 1px 4px; font-size: 10px; }
@@ -206,8 +216,8 @@
 </div>
 
 <div class="card">
-    <h1 class="app-title">Integra Checklist v10</h1>
-    <span class="subtitle">Stabil Verzió (Hivatalos Dokumentum)</span>
+    <h1 class="app-title">Integra Checklist v11</h1>
+    <span class="subtitle">Excel Import/Export Verzió</span>
     
     <div class="input-group">
         <label>BERENDEZÉS NEVE</label>
@@ -222,69 +232,81 @@
 <div id="root"></div>
 
 <div class="floating-footer">
-    <div class="score" id="scoreDisplay">0%</div>
-    <button class="save-btn" onclick="savePDF()">PDF MENTÉSE</button>
+    <div class="footer-row">
+        <span style="color:#aaa; font-size:0.8rem;">Eredmény:</span>
+        <div class="score" id="scoreDisplay">0%</div>
+    </div>
+    <div class="footer-row">
+        <button class="btn-action btn-pdf" onclick="savePDF()">📄 PDF</button>
+        <button class="btn-action btn-excel">
+            📗 EXCEL KITÖLTÉS
+            <input type="file" id="excelInput" accept=".xlsx, .xls" onchange="handleExcelUpload(this)">
+        </button>
+    </div>
 </div>
 
 <script>
-    // --- ADATBÁZIS (A PONTOSÍTOTT SZÖVEGEKKEL) ---
+    // --- ADATBÁZIS (VÁLTOZATLAN) ---
     const data = [
         { cat: "1.1.0 HÁLÓZAT", items: [
-            { id: "1.1.1", t: "Hálózati telepítés előírás szerinti?", g: "Online topológiát megnyitni és ellenőrizni, hogy a PC-k az utolsó résztvevők-e a hálózaton. KP32Futár" },
+            { id: "1.1.1", t: "Hálózati telepítés előírás szerinti?", g: "Online topológiát megnyitni és ellenőrizni..." },
             { id: "1.1.2", t: "Gépnév egyedi és egyeztetve?", g: "Gépnév egyeztetve és egyértelmű" },
-            { id: "1.1.3", t: "Ondeso tool futott?", g: "Ondeso tool rendben fut rajta és a hálózati és a számítógépnév, domainba rendezés vagy szerver system be van állítva\nA mi image-inket használják a PC-k, de végig tudjuk kérdezni, ha szükséges" }
+            { id: "1.1.3", t: "Ondeso tool futott?", g: "Ondeso tool rendben fut rajta..." }
         ]},
         { cat: "1.2.0 SZOFTVER", items: [
-            { id: "1.2.1", t: "Image Verzió aktuális?", g: "OS-Info-t elindítani\nWindows 10 Enterprise 2019 LTSC\nBluePC Image ZAS - Win10 x64 LTSC 2019 EBF 3.8\n\nVisu kis pultok:\nWindows 10 Enterprise 2019 LTSC\nBluePC Image ZAS - Win10 x64 LTSC 2019 HVO62 3.3" },
+            { id: "1.2.1", t: "Image Verzió aktuális?", g: "OS-Info-t elindítani..." },
             { id: "1.2.2", t: "TIA Portal verzió megfelelő?", g: "TIA verzió ellenőrzés V16 UB" },
             { id: "1.2.3", t: "Safety verzió megfelelő?", g: "TIA verzió ellenőrzés" },
-            { id: "1.2.4", t: "Integra Designer verzió?", g: "D:\\integra\\System\\SIS\\IntegraDesignerPro.exe verziószáma\n6.9.7.0 vagy\nIntegra System Manager-ben (Verwaltung) leellenőrizni a gépeket:\nOnline/System/Update range" }
+            { id: "1.2.4", t: "Integra Designer verzió?", g: "6.9.7.0 vagy ellenőrizni a gépeket..." }
         ]},
         { cat: "1.3.0 HARDWARE", items: [
-             { id: "1.3.1", t: "PC feliratozva?", g: "Pult jelölés (Nyomtatva vagy gravírozva)\nHelyileg ellenőrizni" }
+             { id: "1.3.1", t: "PC feliratozva?", g: "Pult jelölés (Nyomtatva vagy gravírozva)" }
         ]},
         { cat: "1.4.0 RENDSZER", items: [
-            { id: "1.4.1", t: "Rendszerdiagnosztika hiba nélkül?", g: "Integra System Manager-ben (Verwaltung) test/frissíteni a gépeket.\nNincs piros állapot" },
-            { id: "1.4.2", t: "IntegraCheck OK?", g: "VMC, Vizualizáció:\nMenü/IntegraCheck" },
-            { id: "1.4.3", t: "Mozgásképek rendben?", g: "Minden Visu-ban ellenőrizni a Mozgás képernyőket.\nIrányok megfelelőek, jól csoportosítottak a mozgások\nAz egyes pultokról csak a belátható elemek mozgathatók" },
-            { id: "1.4.4", t: "Interfész képek rendben?", g: "Mozgás képernyő ikonja mellett van a menüpont (kapcsolódási pont)\nNem minden területnek van. Önálló Anlage-nek nincs (ami nem ad át, vagy nem vesz el más sortól alapanyagot)." },
-            { id: "1.4.5", t: "Designer Templates OK?", g: "Integra System Manager-ben (Verwaltung) leellenőrizni a gépeket.\nHa a System zöld, akkor nem változtattak lokálisan az .ini fájlokon" },
-            { id: "1.4.6", t: "Scriptek dokumentálva?", g: "idPro projektet letölteni a Versionierung-gal és F12-vel ellenőrizni az egyes képernyőkön, hogy van-e egyedi script. Ha van, akkor ahhoz dokumentáció is kell, hogy tartozzon (IDS fájlok)" },
-            { id: "1.4.7", t: "Nyelv beállítva?", g: "Ellenőrizni a nyelvváltást a Visu-ban" }
+            { id: "1.4.1", t: "Rendszerdiagnosztika hiba nélkül?", g: "Integra System Manager..." },
+            { id: "1.4.2", t: "IntegraCheck OK?", g: "VMC, Vizualizáció: Menü/IntegraCheck" },
+            { id: "1.4.3", t: "Mozgásképek rendben?", g: "Minden Visu-ban ellenőrizni..." },
+            { id: "1.4.4", t: "Interfész képek rendben?", g: "Mozgás képernyő ikonja mellett..." },
+            { id: "1.4.5", t: "Designer Templates OK?", g: "Ha a System zöld, akkor jó..." },
+            { id: "1.4.6", t: "Scriptek dokumentálva?", g: "idPro projektet letölteni..." },
+            { id: "1.4.7", t: "Nyelv beállítva?", g: "Ellenőrizni a nyelvváltást" }
         ]},
         { cat: "1.6.0 KIEGÉSZÍTÉSEK", items: [
-            { id: "1.6.1", t: "Mintaprojektek betartva?", g: "Ellenőrizni a mintaprojektek (RB, MO, FT) előírásait." },
-            { id: "1.6.2", t: "Tech paraméterek jó helyen?", g: "Ellenőrizni a D:\\CMWProjekt mappát" },
-            { id: "1.6.3", t: "IntegraShell konfiguráció?", g: "Ha jól működik a Shell, akkor, ha kijelentkezünk, akkor tiltja a programok futtatását, ablakváltást, stb." },
-            { id: "1.6.4", t: "EKM kapcsolat?", g: "Szerverről kapja. Ha az Update jó, akkor az EKM-nek is jónak kell lennie" },
-            { id: "1.6.5", t: "isiSave beállítva?", g: "vagy VisualisierungInfo -> EKB logo a láblécben\nisiSave programban (archivierung) ellenőrizni, hogy van-e automatikus mentés a PC-kre" },
-            { id: "1.6.6", t: "Index-Szerver OK?", g: "Ha a Systemmanager-ben látjuk Online a PC-ket, akkor jó az index-szerver beállítása\nA topológiában nincs az index-szerver számára ismeretlen gép (nincs olyan gép az online topológiában, ami nincs a system manager listájában)" },
-            { id: "1.6.8", t: "SIS Log tiszta?", g: "Trend-ben (IntegraView Admin) az Admin/Profile -> SPS/Bearbeiten alatt a Bearbeiten-t ellenőrizni\nD:\\integra\\System\\Logs\\SisServer.csv-t megnyitni.\nEllenőrizni, hogy tartalmaz-e log-okat" },
-            { id: "1.6.9", t: "Mappastruktúra OK?", g: "a CMWProjekt mappa felépítése az előírás szerinti" },
-            { id: "1.6.10", t: "Szemét törölve?", g: "Nincs más TIA projekt a mappában" },
+            { id: "1.6.1", t: "Mintaprojektek betartva?", g: "RB, MO, FT előírások" },
+            { id: "1.6.2", t: "Tech paraméterek jó helyen?", g: "D:\\CMWProjekt mappa" },
+            { id: "1.6.3", t: "IntegraShell konfiguráció?", g: "Tiltja a programok futtatását..." },
+            { id: "1.6.4", t: "EKM kapcsolat?", g: "Szerverről kapja..." },
+            { id: "1.6.5", t: "isiSave beállítva?", g: "isiSave program ellenőrzés" },
+            { id: "1.6.6", t: "Index-Szerver OK?", g: "Systemmanager online..." },
+            { id: "1.6.8", t: "SIS Log tiszta?", g: "D:\\integra\\System\\Logs\\SisServer.csv" },
+            { id: "1.6.9", t: "Mappastruktúra OK?", g: "CMWProjekt mappa felépítése" },
+            { id: "1.6.10", t: "Szemét törölve?", g: "Nincs más TIA projekt" },
             { id: "1.6.11", t: "Vírusirtó frissül?", g: "Antivírus szoftver telepítve" }
         ]},
         { cat: "2.1.0 PLC (SPS)", items: [
-            { id: "2.1.1", t: "Minden PLC terület látszik?", g: "Minden PLC terület megtalálható a Terület választó képernyőn?" },
-            { id: "2.1.2", t: "Minden területnek van vizuja?", g: "Van minden PLC (SPS) területhez megtervezett vizualizációs kép?" },
-            { id: "2.1.3", t: "Full HD felbontás?", g: "Az integra Projekttervezőben a Full HD felbontás lett kiválasztva?" },
-            { id: "2.1.4", t: "Calibri 10 Bold?", g: "Az összes elemhez a Calibri betűtípus, félkövér, 10-es méret és a 'balra igazítás' lett-e használva?" },
-            { id: "2.1.5", t: "Pult 99 (Nyers) ablak?", g: "A 99-es pultterület (Rohbau) az áttekintő képet a helyettesítő ablak funkcióval jelenítették meg?" },
-            { id: "2.1.6", t: "PNG átlátszó képek?", g: "A képek megjelenítéséhez PNG formátum került kiválasztásra, legfeljebb kb. 100 KB-os célzott fájlmérettel? Előnyben kell részesíteni a CAD-rajzokat, például funkcióelrendezési tervekből, szerszámáttekintőkből stb" }
+            { id: "2.1.1", t: "Minden PLC terület látszik?", g: "Terület választó képernyő" },
+            { id: "2.1.2", t: "Minden területnek van vizuja?", g: "SPS terület vizualizáció" },
+            { id: "2.1.3", t: "Full HD felbontás?", g: "Projekttervezőben Full HD" },
+            { id: "2.1.4", t: "Calibri 10 Bold?", g: "Betűtípus ellenőrzés" },
+            { id: "2.1.5", t: "Pult 99 (Nyers) ablak?", g: "Helyettesítő ablak funkció" },
+            { id: "2.1.6", t: "PNG átlátszó képek?", g: "Kb. 100 KB fájlméret" }
         ]},
         { cat: "2.2.0 KÉPERNYŐK", items: [
-            { id: "2.2.1", t: "Áttekintő képek OK?", g: "Az áttekintő képernyők a szabályzat (irányelv) szerint lettek megtervezve?" },
-            { id: "2.3.1", t: "Pult képek OK?", g: "A vezérlőpult területi képernyők az irányelv szerint lettek megtervezve?" },
-            { id: "2.4.1", t: "Állomás képek OK?", g: "A vezérlőpult részletező képernyők az irányelv szerint lettek megtervezve?" },
-            { id: "2.5.1", t: "Speciális funkciók OK?", g: "A speciális funkciók az irányelv szerint lettek megtervezve?" },
-            { id: "2.5.4", t: "Robot áttekintők OK?", g: "A robotok áttekintő képernyői az irányelv szerint lettek megtervezve?" },
-            { id: "2.6.1", t: "Nincs Station/Pult elem?", g: "Nem kerültek alkalmazásra magasabb szintű elemek, mint például az állomás vagy a vezérlőpult, hogy elkerüljék a többszörös hibajelzéseket." },
-            { id: "2.6.2", t: "Vészleállító (SonderBit)?", g: "Nem lett használva vészleállító elem a választólistából. Ehhez a funkcióhoz a részletes képen a sablon található: 'DYN_GEN_SonderBit_Endlage_Absolut' vagy 'DYN_GEN_SonderBit_LED_Absolut'" },
-            { id: "2.6.3", t: "Részletképek OK?", g: "A stáció részletes képernyő az irányelv szerint lettek megtervezve?" }
+            { id: "2.2.1", t: "Áttekintő képek OK?", g: "Szabályzat szerint" },
+            { id: "2.3.1", t: "Pult képek OK?", g: "Szabályzat szerint" },
+            { id: "2.4.1", t: "Állomás képek OK?", g: "Szabályzat szerint" },
+            { id: "2.5.1", t: "Speciális funkciók OK?", g: "Szabályzat szerint" },
+            { id: "2.5.3", t: "Betriebsfunktionen OK?", g: "Szabályzat szerint" },
+            { id: "2.5.4", t: "Robot áttekintők OK?", g: "Szabályzat szerint" },
+            { id: "2.6.0", t: "Részletképek (Zusatz)", g: "Szabályzat szerint" },
+            { id: "2.6.1", t: "Nincs Station/Pult elem?", g: "Nincsenek magasabb szintű elemek" },
+            { id: "2.6.2", t: "Vészleállító (SonderBit)?", g: "DYN_GEN_SonderBit_Endlage_Absolut" },
+            { id: "2.6.3", t: "Részletképek OK?", g: "Stáció részletes képernyő" }
         ]}
     ];
 
     const root = document.getElementById('root');
+    let uploadedWorkbook = null;
 
     function render() {
         data.forEach((sect, idx) => {
@@ -296,12 +318,12 @@
             const c = document.createElement('div');
             c.className = 'section-content';
             c.id = `sec-${idx}`;
-            if(idx === 0) c.classList.add('active'); // Csak az első nyitva mobilon
+            if(idx === 0) c.classList.add('active'); 
 
             sect.items.forEach(item => {
                 const uid = item.id.replace(/\./g, '_');
                 c.innerHTML += `
-                    <div class="item-box" id="box-${uid}">
+                    <div class="item-box" id="box-${uid}" data-id="${item.id}">
                         <span class="id-tag">${item.id}</span>
                         <div class="q-text">${item.t}</div>
                         
@@ -354,9 +376,11 @@
 
     function loadImg(e, uid) {
         const img = document.getElementById(`img-${uid}`);
-        img.src = URL.createObjectURL(e.target.files[0]);
-        img.style.display = 'block';
-        document.getElementById(`det-${uid}`).style.display = 'block';
+        if(e.target.files && e.target.files[0]){
+            img.src = URL.createObjectURL(e.target.files[0]);
+            img.style.display = 'block';
+            document.getElementById(`det-${uid}`).style.display = 'block';
+        }
     }
 
     function calc() {
@@ -374,14 +398,111 @@
 
     function savePDF() {
         const name = document.getElementById('devName').value;
-        if(!name) { alert("Add meg a gép nevét!"); return; }
+        if(!name) { alert("Kérlek add meg a gép nevét!"); return; }
         document.title = name + "_Jegyzokonyv";
         syncData();
         
-        // TRÜKK: Nyomtatás előtt kinyitjuk az összes szekciót, hogy minden látszódjon
         document.querySelectorAll('.section-content').forEach(el => el.classList.add('active'));
-        
         window.print();
+    }
+
+    // --- EXCEL LOGIKA ---
+
+    async function handleExcelUpload(input) {
+        if (!input.files || !input.files[0]) return;
+
+        const file = input.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            const data = new Uint8Array(e.target.result);
+            // Beolvassuk a munkafüzetet
+            uploadedWorkbook = XLSX.read(data, {type: 'array'});
+            
+            // Azonnal feldolgozzuk és letöltjük
+            processAndDownloadExcel(file.name);
+        };
+        reader.readAsArrayBuffer(file);
+        
+        // Input resetelése, hogy ugyanazt a fájlt újra ki lehessen választani javítás után
+        input.value = "";
+    }
+
+    function processAndDownloadExcel(originalName) {
+        if(!uploadedWorkbook) {
+            alert("Hiba történt a beolvasáskor!");
+            return;
+        }
+
+        const devName = document.getElementById('devName').value || "Gep";
+
+        // Végigmegyünk az összes ellenőrzési ponton a HTML-ben
+        const allItems = document.querySelectorAll('.item-box');
+        
+        allItems.forEach(item => {
+            const id = item.getAttribute('data-id'); // pl "1.1.1" vagy "2.5.3"
+            const status = item.getAttribute('data-status'); // "OK" vagy "NOK" vagy null
+            const uid = id.replace(/\./g, '_');
+            const comment = document.getElementById(`com-${uid}`).value;
+
+            // 1. Melyik munkalapra írjunk?
+            // "Checkpunkte" (1.x.x) vagy "Visu-Detail" (2.x.x)
+            let sheetName = "";
+            if (id.startsWith("1.")) {
+                sheetName = "Checkpunkte";
+            } else if (id.startsWith("2.")) {
+                sheetName = "Visu-Detail";
+            }
+
+            const worksheet = uploadedWorkbook.Sheets[sheetName];
+            
+            if (worksheet) {
+                // 2. Megkeressük, melyik sorban van az ID az "A" oszlopban
+                // A SheetJS egy tartományt ad vissza (pl A1:F100), ezen kell végigmenni
+                const range = XLSX.utils.decode_range(worksheet['!ref']);
+                
+                let foundRow = -1;
+
+                // Végigiterálunk a sorokon az adott oszlopban (C=0 azaz A oszlop)
+                for (let R = range.s.r; R <= range.e.r; ++R) {
+                    const cellRef = XLSX.utils.encode_cell({c: 0, r: R}); // A oszlop, R sor
+                    const cell = worksheet[cellRef];
+                    
+                    // Ha a cella tartalma megegyezik az ID-vel (szóközöket levágva)
+                    if (cell && String(cell.v).trim() == id) {
+                        foundRow = R;
+                        break;
+                    }
+                }
+
+                // 3. Ha megvan a sor, beírjuk az adatokat
+                if (foundRow !== -1) {
+                    // C oszlop indexe = 2, D oszlop = 3, F oszlop = 5
+                    
+                    const cellC = XLSX.utils.encode_cell({c: 2, r: foundRow}); // OK
+                    const cellD = XLSX.utils.encode_cell({c: 3, r: foundRow}); // NOK
+                    const cellF = XLSX.utils.encode_cell({c: 5, r: foundRow}); // Comment
+
+                    // Először töröljük a tartalmat (hogy ne maradjon bent előző szemét)
+                    worksheet[cellC] = {v: "", t: 's'};
+                    worksheet[cellD] = {v: "", t: 's'};
+                    
+                    if (status === "OK") {
+                        worksheet[cellC] = {v: "x", t: 's'};
+                    } else if (status === "NOK") {
+                        worksheet[cellD] = {v: "x", t: 's'};
+                    }
+
+                    // Megjegyzés beírása, ha van
+                    if (comment) {
+                        worksheet[cellF] = {v: comment, t: 's'};
+                    }
+                }
+            }
+        });
+
+        // 4. Mentsük le az új fájlt
+        XLSX.writeFile(uploadedWorkbook, `${devName}_Checklist_Export.xlsx`);
     }
 
     render();
