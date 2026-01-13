@@ -3,201 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INTEGRA CHECKLIST V11 - EXCEL</title>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <title>INTEGRA CHECKLIST V12 - STYLE PRESERVER</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
     <style>
-        /* --- ALAP STÍLUSOK (SÖTÉT MÓD) --- */
+        /* --- STÍLUSOK (Ugyanaz, mint eddig) --- */
         :root {
-            --bg: #121212;
-            --card: #1e1e1e;
-            --primary: #00bcd4;  /* Neon Kék */
-            --success: #00e676;  /* Neon Zöld */
-            --danger: #ff5252;   /* Neon Piros */
-            --excel: #21a366;    /* Excel Zöld */
-            --text: #ffffff;
+            --bg: #121212; --card: #1e1e1e; --primary: #00bcd4;
+            --success: #00e676; --danger: #ff5252; --excel: #21a366; --text: #ffffff;
         }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Segoe UI', -apple-system, sans-serif;
-            margin: 0;
-            padding: 20px;
-            padding-bottom: 140px; /* Megnövelt hely a lebegő gomboknak */
-        }
-
-        /* --- KÁRTYÁK --- */
-        .card {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid #333;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-
-        h1.app-title { 
-            color: var(--primary); margin: 0; 
-            text-transform: uppercase; font-size: 1.4rem; letter-spacing: 1px;
-        }
-        .subtitle { 
-            color: #888; font-size: 0.9rem; margin-bottom: 20px; 
-            display: block; border-bottom: 1px solid #333; padding-bottom: 10px; 
-        }
-
-        /* --- BEVITELI MEZŐK --- */
-        .input-group { margin-bottom: 15px; }
-        .input-group label { 
-            color: var(--primary); font-size: 0.8rem; 
-            font-weight: bold; display: block; margin-bottom: 5px; 
-        }
-        .input-group input { 
-            background: #2c2c2c; border: 1px solid #444; color: #fff; 
-            width: 100%; padding: 12px; border-radius: 6px; 
-            font-size: 1rem; box-sizing: border-box; 
-        }
-
-        /* --- SZEKCIÓK --- */
-        .section-header {
-            background: #252525; color: var(--primary); padding: 15px; 
-            font-weight: bold; margin-top: 30px; 
-            border-left: 4px solid var(--primary); border-radius: 8px; 
-            cursor: pointer; display: flex; justify-content: space-between; align-items: center;
-        }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; padding-bottom: 140px; }
+        .card { background: var(--card); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #333; }
+        .input-group label { color: var(--primary); font-size: 0.8rem; font-weight: bold; display: block; margin-bottom: 5px; }
+        .input-group input { background: #2c2c2c; border: 1px solid #444; color: #fff; width: 100%; padding: 12px; border-radius: 6px; font-size: 1rem; box-sizing: border-box; }
+        .section-header { background: #252525; color: var(--primary); padding: 15px; font-weight: bold; margin-top: 30px; border-left: 4px solid var(--primary); border-radius: 8px; cursor: pointer; display: flex; justify-content: space-between; }
         .section-content { display: none; margin-top: 10px; }
         .section-content.active { display: block; }
-
-        /* --- LISTA ELEMEK --- */
-        .item-box {
-            background: var(--card); padding: 15px; margin-bottom: 15px; 
-            border-radius: 8px; border: 1px solid #333; position: relative;
-        }
+        .item-box { background: var(--card); padding: 15px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #333; position: relative; }
         .item-box[data-status="OK"] { border-left: 6px solid var(--success); }
         .item-box[data-status="NOK"] { border-left: 6px solid var(--danger); }
-
-        .id-tag { 
-            background: #333; color: var(--primary); padding: 3px 6px; 
-            font-size: 0.75rem; border-radius: 4px; font-weight: bold; 
-        }
+        .id-tag { background: #333; color: var(--primary); padding: 3px 6px; font-size: 0.75rem; border-radius: 4px; font-weight: bold; }
         .q-text { font-size: 1.05rem; margin: 12px 0; line-height: 1.4; font-weight: 500; }
-
-        /* --- GOMBOK --- */
         .btn-row { display: flex; gap: 10px; margin-top: 15px; }
-        button { 
-            flex: 1; padding: 12px; border: none; border-radius: 6px; 
-            font-weight: bold; cursor: pointer; color: #fff; font-size: 0.9rem;
-            transition: opacity 0.2s;
-        }
-        .btn-guide { flex: 0 0 50px; background: #333; color: var(--primary); font-size: 1.2rem; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: #fff; }
+        .btn-guide { flex: 0 0 50px; background: #333; color: var(--primary); }
         .btn-ok { background: #1b5e20; opacity: 0.6; }
         .btn-nok { background: #b71c1c; opacity: 0.6; }
-        
-        .btn-ok.active { background: var(--success); color: #000; opacity: 1; box-shadow: 0 0 10px rgba(0,230,118,0.4); }
-        .btn-nok.active { background: var(--danger); color: #fff; opacity: 1; box-shadow: 0 0 10px rgba(255,82,82,0.4); }
-
-        /* --- RÉSZLETEK (Lenyíló) --- */
+        .btn-ok.active { background: var(--success); color: #000; opacity: 1; }
+        .btn-nok.active { background: var(--danger); color: #fff; opacity: 1; }
         .details { display: none; margin-top: 15px; border-top: 1px dashed #444; padding-top: 15px; }
-        .guide-box { 
-            background: rgba(0,188,212,0.1); color: #ddd; padding: 12px; 
-            border-radius: 6px; font-size: 0.9rem; margin-bottom: 15px; 
-            white-space: pre-line; border-left: 2px solid var(--primary);
-        }
-        textarea { 
-            width: 100%; background: #111; color: #fff; border: 1px solid #444; 
-            padding: 10px; border-radius: 6px; box-sizing: border-box; min-height: 60px; font-family: inherit;
-        }
-        .file-upload { 
-            display: block; background: #333; color: var(--primary); 
-            padding: 12px; text-align: center; margin-top: 10px; 
-            border-radius: 6px; border: 1px dashed #555; cursor: pointer;
-        }
-        .img-preview { width: 100%; max-height: 250px; object-fit: contain; margin-top: 10px; display: none; border: 1px solid #444; border-radius: 4px; }
-
-        /* --- FIX LÁBLÉC --- */
-        .floating-footer {
-            position: fixed; bottom: 0; left: 0; right: 0; 
-            background: rgba(30,30,30,0.95); backdrop-filter: blur(5px);
-            border-top: 2px solid var(--primary); padding: 15px; 
-            display: flex; flex-direction: column; gap: 10px;
-            z-index: 999;
-        }
-        .footer-row {
-            display: flex; align-items: center; justify-content: space-between; gap: 10px;
-        }
-        .score { font-size: 1.5rem; color: var(--primary); font-weight: bold; margin-left: 10px; }
-        
-        .btn-action { 
-            padding: 10px 20px; border-radius: 30px; font-weight: bold; border: none; font-size: 0.9rem; text-transform: uppercase;
-        }
+        .guide-box { background: rgba(0,188,212,0.1); color: #ddd; padding: 12px; border-radius: 6px; margin-bottom: 15px; white-space: pre-line; border-left: 2px solid var(--primary); }
+        textarea { width: 100%; background: #111; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 6px; min-height: 60px; }
+        .floating-footer { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(30,30,30,0.95); border-top: 2px solid var(--primary); padding: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 999; }
+        .footer-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .score { font-size: 1.5rem; color: var(--primary); font-weight: bold; }
+        .btn-action { padding: 10px 20px; border-radius: 30px; font-weight: bold; border: none; font-size: 0.9rem; text-transform: uppercase; }
         .btn-pdf { background: var(--primary); color: #000; }
         .btn-excel { background: var(--excel); color: #fff; position: relative; overflow: hidden; }
-
         #excelInput { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-
-        /* --- NYOMTATÁS / PDF SPECIALISTA STÍLUSOK --- */
+        
+        /* Print stílusok */
         #print-header { display: none; }
-
         @media print {
-            @page { margin: 15mm; size: A4; }
-            
-            body { 
-                background: #fff; color: #000; padding: 0; margin: 0; 
-                font-family: Arial, sans-serif; font-size: 11px;
-            }
-
-            /* Elemek elrejtése */
-            .floating-footer, .btn-guide, .file-upload, .btn-row button { display: none !important; }
-            .subtitle, .section-header span:last-child { display: none; }
-            .input-group { display: none; } 
-            .card { border: none; box-shadow: none; margin: 0; padding: 0; background: none; color: #000; }
-
-            /* Fejléc megjelenítése */
-            #print-header { 
-                display: block; border-bottom: 2px solid #000; 
-                margin-bottom: 20px; padding-bottom: 10px; 
-            }
-            #print-header h1 { font-size: 18px; color: #000; margin-bottom: 10px; text-align: center; }
-            .meta-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; border-bottom: 1px solid #eee; padding-bottom: 2px;}
-
-            /* Szekciók */
-            .section-header { 
-                background: #eee !important; color: #000 !important; 
-                margin: 20px 0 10px 0 !important; padding: 5px 10px !important;
-                border: none !important; border-bottom: 1px solid #000 !important; 
-                border-radius: 0 !important; font-size: 12px !important; 
-                page-break-after: avoid; 
-            }
-            .section-content { display: block !important; margin: 0; }
-
-            /* Lista elemek */
-            .item-box {
-                border: none; border-bottom: 1px dotted #ccc; 
-                margin: 0; padding: 10px 0; 
-                border-radius: 0; background: none; 
-                page-break-inside: avoid; 
-            }
-
-            .id-tag { background: none; color: #000; border: 1px solid #000; padding: 1px 4px; font-size: 10px; }
-            .q-text { margin: 5px 0; font-weight: bold; font-size: 11px; color: #000; }
-
-            /* Státusz kiírása */
-            .item-box::after {
-                display: block; float: right; font-weight: bold; font-size: 11px; margin-top: -30px;
-            }
-            .item-box[data-status="OK"]::after { content: "✔ MEGFELELŐ"; color: green; }
-            .item-box[data-status="NOK"]::after { content: "✖ HIBÁS"; color: red; }
-            .item-box:not([data-status])::after { content: "○ ÜRES"; color: #999; }
-
-            /* Részletek */
-            .guide-box { display: none; }
-            .details { display: block !important; border: none; margin: 0; padding: 0; }
-            textarea { 
-                border: none; background: none; color: #000; padding: 0; 
-                font-style: italic; min-height: auto; font-size: 11px;
-                display: block; width: 100%; resize: none;
-            }
-            .img-preview { display: block; max-height: 150px; max-width: 200px; border: 1px solid #ccc; margin-top: 5px; }
+            .floating-footer, .btn-guide, .btn-row button, .input-group, .subtitle { display: none !important; }
+            .card { border: none; padding: 0; }
+            #print-header { display: block; border-bottom: 2px solid #000; margin-bottom: 20px; }
+            .section-header { background: #eee !important; color: #000 !important; border: none !important; border-bottom: 1px solid #000 !important; }
+            .section-content { display: block !important; }
+            .item-box { border: none; border-bottom: 1px dotted #ccc; page-break-inside: avoid; color: #000; }
+            .item-box[data-status="OK"]::after { content: "✔ MEGFELELŐ"; color: green; float: right; margin-top: -30px; font-weight: bold;}
+            .item-box[data-status="NOK"]::after { content: "✖ HIBÁS"; color: red; float: right; margin-top: -30px; font-weight: bold;}
         }
     </style>
 </head>
@@ -205,19 +62,19 @@
 
 <div id="print-header">
     <h1>INTEGRA ELLENŐRZÉSI JEGYZŐKÖNYV</h1>
-    <div class="meta-row">
+    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
         <span><strong>Berendezés:</strong> <span id="p-dev">-</span></span>
         <span><strong>Dátum:</strong> <span id="p-date">-</span></span>
     </div>
-    <div class="meta-row">
+    <div style="display:flex; justify-content:space-between;">
         <span><strong>Ellenőr:</strong> <span id="p-op">-</span></span>
         <span><strong>Eredmény:</strong> <span id="p-score">0%</span></span>
     </div>
 </div>
 
 <div class="card">
-    <h1 class="app-title">Integra Checklist v11</h1>
-    <span class="subtitle">Excel Import/Export Verzió</span>
+    <h1 style="color:var(--primary); margin:0;">INTEGRA CHECKLIST v12</h1>
+    <span class="subtitle" style="color:#888; display:block; margin-bottom:20px;">Excel Style-Preserver Edition</span>
     
     <div class="input-group">
         <label>BERENDEZÉS NEVE</label>
@@ -233,20 +90,20 @@
 
 <div class="floating-footer">
     <div class="footer-row">
-        <span style="color:#aaa; font-size:0.8rem;">Eredmény:</span>
+        <span style="color:#aaa;">Eredmény:</span>
         <div class="score" id="scoreDisplay">0%</div>
     </div>
     <div class="footer-row">
         <button class="btn-action btn-pdf" onclick="savePDF()">📄 PDF</button>
         <button class="btn-action btn-excel">
-            📗 EXCEL KITÖLTÉS
-            <input type="file" id="excelInput" accept=".xlsx, .xls" onchange="handleExcelUpload(this)">
+            📗 EXCEL FELTÖLTÉS & MENTÉS
+            <input type="file" id="excelInput" accept=".xlsx" onchange="handleExcel(this)">
         </button>
     </div>
 </div>
 
 <script>
-    // --- ADATBÁZIS (VÁLTOZATLAN) ---
+    // --- ADATBÁZIS ---
     const data = [
         { cat: "1.1.0 HÁLÓZAT", items: [
             { id: "1.1.1", t: "Hálózati telepítés előírás szerinti?", g: "Online topológiát megnyitni és ellenőrizni..." },
@@ -306,7 +163,6 @@
     ];
 
     const root = document.getElementById('root');
-    let uploadedWorkbook = null;
 
     function render() {
         data.forEach((sect, idx) => {
@@ -326,21 +182,14 @@
                     <div class="item-box" id="box-${uid}" data-id="${item.id}">
                         <span class="id-tag">${item.id}</span>
                         <div class="q-text">${item.t}</div>
-                        
                         <div class="btn-row">
                             <button class="btn-guide" onclick="toggleDetails('${uid}')">?</button>
                             <button class="btn-ok" onclick="setStatus('${uid}', 'OK')">OK</button>
                             <button class="btn-nok" onclick="setStatus('${uid}', 'NOK')">NOK</button>
                         </div>
-
                         <div class="details" id="det-${uid}">
                             <div class="guide-box">${item.g}</div>
                             <textarea placeholder="Megjegyzés írása..." id="com-${uid}"></textarea>
-                            <label class="file-upload">
-                                📷 Kép csatolása
-                                <input type="file" accept="image/*" style="display:none" onchange="loadImg(event, '${uid}')">
-                            </label>
-                            <img id="img-${uid}" class="img-preview">
                         </div>
                     </div>
                 `;
@@ -359,28 +208,13 @@
     function setStatus(uid, s) {
         const box = document.getElementById(`box-${uid}`);
         const btns = box.querySelectorAll('.btn-row button');
-        
         btns[1].classList.remove('active');
         btns[2].classList.remove('active');
-
         box.setAttribute('data-status', s);
 
-        if(s === 'OK') {
-            btns[1].classList.add('active');
-        } else {
-            btns[2].classList.add('active');
-            document.getElementById(`det-${uid}`).style.display = 'block';
-        }
+        if(s === 'OK') { btns[1].classList.add('active'); } 
+        else { btns[2].classList.add('active'); document.getElementById(`det-${uid}`).style.display = 'block'; }
         calc();
-    }
-
-    function loadImg(e, uid) {
-        const img = document.getElementById(`img-${uid}`);
-        if(e.target.files && e.target.files[0]){
-            img.src = URL.createObjectURL(e.target.files[0]);
-            img.style.display = 'block';
-            document.getElementById(`det-${uid}`).style.display = 'block';
-        }
     }
 
     function calc() {
@@ -397,112 +231,101 @@
     }
 
     function savePDF() {
-        const name = document.getElementById('devName').value;
-        if(!name) { alert("Kérlek add meg a gép nevét!"); return; }
+        const name = document.getElementById('devName').value || "Checklist";
         document.title = name + "_Jegyzokonyv";
         syncData();
-        
         document.querySelectorAll('.section-content').forEach(el => el.classList.add('active'));
         window.print();
     }
 
-    // --- EXCEL LOGIKA ---
-
-    async function handleExcelUpload(input) {
+    // --- PROFESSZIONÁLIS EXCEL KEZELÉS (EXCELJS) ---
+    async function handleExcel(input) {
         if (!input.files || !input.files[0]) return;
-
         const file = input.files[0];
-        const reader = new FileReader();
-
-        reader.onload = function(e) {
-            const data = new Uint8Array(e.target.result);
-            // Beolvassuk a munkafüzetet
-            uploadedWorkbook = XLSX.read(data, {type: 'array'});
-            
-            // Azonnal feldolgozzuk és letöltjük
-            processAndDownloadExcel(file.name);
-        };
-        reader.readAsArrayBuffer(file);
-        
-        // Input resetelése, hogy ugyanazt a fájlt újra ki lehessen választani javítás után
-        input.value = "";
-    }
-
-    function processAndDownloadExcel(originalName) {
-        if(!uploadedWorkbook) {
-            alert("Hiba történt a beolvasáskor!");
-            return;
-        }
-
         const devName = document.getElementById('devName').value || "Gep";
 
-        // Végigmegyünk az összes ellenőrzési ponton a HTML-ben
-        const allItems = document.querySelectorAll('.item-box');
-        
-        allItems.forEach(item => {
-            const id = item.getAttribute('data-id'); // pl "1.1.1" vagy "2.5.3"
-            const status = item.getAttribute('data-status'); // "OK" vagy "NOK" vagy null
-            const uid = id.replace(/\./g, '_');
-            const comment = document.getElementById(`com-${uid}`).value;
+        const workbook = new ExcelJS.Workbook();
+        const reader = new FileReader();
 
-            // 1. Melyik munkalapra írjunk?
-            // "Checkpunkte" (1.x.x) vagy "Visu-Detail" (2.x.x)
-            let sheetName = "";
-            if (id.startsWith("1.")) {
-                sheetName = "Checkpunkte";
-            } else if (id.startsWith("2.")) {
-                sheetName = "Visu-Detail";
-            }
-
-            const worksheet = uploadedWorkbook.Sheets[sheetName];
+        reader.onload = async function(e) {
+            const buffer = e.target.result;
             
-            if (worksheet) {
-                // 2. Megkeressük, melyik sorban van az ID az "A" oszlopban
-                // A SheetJS egy tartományt ad vissza (pl A1:F100), ezen kell végigmenni
-                const range = XLSX.utils.decode_range(worksheet['!ref']);
+            try {
+                // Betöltjük a meglévő fájlt szerkezettel együtt
+                await workbook.xlsx.load(buffer);
                 
-                let foundRow = -1;
+                // Végigmegyünk a HTML listán
+                const allItems = document.querySelectorAll('.item-box');
+                
+                allItems.forEach(item => {
+                    const id = item.getAttribute('data-id'); // "1.1.1"
+                    const status = item.getAttribute('data-status'); // "OK", "NOK"
+                    const uid = id.replace(/\./g, '_');
+                    const comment = document.getElementById(`com-${uid}`).value;
 
-                // Végigiterálunk a sorokon az adott oszlopban (C=0 azaz A oszlop)
-                for (let R = range.s.r; R <= range.e.r; ++R) {
-                    const cellRef = XLSX.utils.encode_cell({c: 0, r: R}); // A oszlop, R sor
-                    const cell = worksheet[cellRef];
-                    
-                    // Ha a cella tartalma megegyezik az ID-vel (szóközöket levágva)
-                    if (cell && String(cell.v).trim() == id) {
-                        foundRow = R;
-                        break;
+                    // Munkalap kiválasztása
+                    let sheetName = "";
+                    if (id.startsWith("1.")) sheetName = "Checkpunkte"; // Vagy "Checkpunkte"
+                    else if (id.startsWith("2.")) sheetName = "Visu-Detail"; // "Visu details" / "Visu-Detail"
+
+                    // Munkalap keresése (figyelmen kívül hagyva a kis/nagybetűt)
+                    const worksheet = workbook.worksheets.find(ws => 
+                        ws.name.toLowerCase().includes(sheetName.toLowerCase().replace("-", " ")) || 
+                        ws.name.toLowerCase().includes(sheetName.toLowerCase())
+                    );
+
+                    if (worksheet) {
+                        // Megkeressük a sort az 'A' oszlopban
+                        let targetRow = null;
+                        
+                        worksheet.eachRow((row, rowNumber) => {
+                            const cellA = row.getCell(1).value; // A oszlop
+                            if (cellA && cellA.toString().trim() == id) {
+                                targetRow = row;
+                            }
+                        });
+
+                        if (targetRow) {
+                            // Cella elérése (C=3, D=4, F=6)
+                            const cellC = targetRow.getCell(3); // OK
+                            const cellD = targetRow.getCell(4); // NOK
+                            const cellF = targetRow.getCell(6); // Komment
+
+                            // Töröljük a korábbi tartalmat (csak az értéket, a stílust nem!)
+                            cellC.value = null;
+                            cellD.value = null;
+                            cellF.value = null;
+
+                            if (status === "OK") {
+                                cellC.value = "x";
+                                cellC.alignment = { horizontal: 'center' }; // Opcionális: középre igazítás
+                            } else if (status === "NOK") {
+                                cellD.value = "x";
+                                cellD.alignment = { horizontal: 'center' };
+                            }
+
+                            if (comment) {
+                                cellF.value = comment;
+                            }
+                        }
                     }
-                }
+                });
 
-                // 3. Ha megvan a sor, beírjuk az adatokat
-                if (foundRow !== -1) {
-                    // C oszlop indexe = 2, D oszlop = 3, F oszlop = 5
-                    
-                    const cellC = XLSX.utils.encode_cell({c: 2, r: foundRow}); // OK
-                    const cellD = XLSX.utils.encode_cell({c: 3, r: foundRow}); // NOK
-                    const cellF = XLSX.utils.encode_cell({c: 5, r: foundRow}); // Comment
+                // Fájl mentése (blob generálás)
+                const outBuffer = await workbook.xlsx.writeBuffer();
+                const blob = new Blob([outBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+                saveAs(blob, `${devName}_Checklist_Kitoltott.xlsx`);
+                
+                alert("Sikeres mentés! A formázás megmaradt.");
 
-                    // Először töröljük a tartalmat (hogy ne maradjon bent előző szemét)
-                    worksheet[cellC] = {v: "", t: 's'};
-                    worksheet[cellD] = {v: "", t: 's'};
-                    
-                    if (status === "OK") {
-                        worksheet[cellC] = {v: "x", t: 's'};
-                    } else if (status === "NOK") {
-                        worksheet[cellD] = {v: "x", t: 's'};
-                    }
-
-                    // Megjegyzés beírása, ha van
-                    if (comment) {
-                        worksheet[cellF] = {v: comment, t: 's'};
-                    }
-                }
+            } catch (err) {
+                console.error(err);
+                alert("Hiba történt a fájl feldolgozása közben: " + err.message);
             }
-        });
+        };
 
-        // 4. Mentsük le az új fájlt
-        XLSX.writeFile(uploadedWorkbook, `${devName}_Checklist_Export.xlsx`);
+        reader.readAsArrayBuffer(file);
+        input.value = ""; // Reset
     }
 
     render();
