@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INTEGRA AUTO-EXPORT V15</title>
+    <title>INTEGRA AUTO-EXPORT V16</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 
@@ -88,8 +88,8 @@
 </div>
 
 <div class="card">
-    <h1 style="color:var(--primary); margin:0;">INTEGRA CHECKLIST v15</h1>
-    <span class="subtitle" style="color:#888; font-size:0.9rem;">Auto-Name & Hardcoded Link</span>
+    <h1 style="color:var(--primary); margin:0;">INTEGRA CHECKLIST v16</h1>
+    <span class="subtitle" style="color:#888; font-size:0.9rem;">Fix: Képletek frissítése</span>
     
     <div class="row-group">
         <div class="input-group" style="flex:2;">
@@ -125,7 +125,7 @@
 
 <script>
     // --- KONFIGURÁCIÓ ---
-    // A GitHub Raw link (Space helyett %20)
+    // A GitHub Raw link
     const GITHUB_TEMPLATE_URL = "https://raw.githubusercontent.com/balazsnorberttt-prog/integra-checklist-files/main/DE_PCS_031_02_XXXX_SPSX_Visu%20Checkliste.xlsx";
     const TRANSLATE_API = "https://api.mymemory.translated.net/get";
     
@@ -293,7 +293,7 @@
         status.innerText = "Sablon letöltése...";
 
         try {
-            // 1. Sablon letöltése GitHub-ról (hardcoded)
+            // 1. Sablon letöltése GitHub-ról
             const response = await fetch(GITHUB_TEMPLATE_URL);
             if(!response.ok) throw new Error("Hiba a sablon letöltésekor. Ellenőrizd az internetkapcsolatot!");
             const buffer = await response.arrayBuffer();
@@ -301,6 +301,10 @@
             // 2. Excel betöltése
             const workbook = new ExcelJS.Workbook();
             await workbook.xlsx.load(buffer);
+
+            // --- JAVÍTÁS: KÉPLETEK ÚJRASZÁMOLÁSA ---
+            // Ez a sor kényszeríti az Excelt, hogy megnyitáskor azonnal számolja újra a formulákat!
+            workbook.calcProperties.fullCalcOnLoad = true;
 
             // 3. Adatok feldolgozása és fordítás
             const allItems = document.querySelectorAll('.item-box');
@@ -358,16 +362,9 @@
                 }
             }
 
-            // 4. MENTÉS - ÚJ FILENÉV LOGIKA
-            // Eredeti: DE_PCS_031_02_XXXX_SPSX_Visu Checkliste.xlsx
-            // Új: cseréljük az XXXX-et és az SPSX-et
-            
+            // 4. MENTÉS
             let finalFileName = "DE_PCS_031_02_XXXX_SPSX_Visu Checkliste.xlsx";
-            
-            // XXXX cseréje a gép nevére (pl. SM31)
             finalFileName = finalFileName.replace("XXXX", devName);
-            
-            // SPSX cseréje SPS + Számra (pl. SPS1)
             finalFileName = finalFileName.replace("SPSX", "SPS" + plcNum);
 
             btn.innerHTML = '<div class="spinner"></div> MENTÉS...';
@@ -378,13 +375,13 @@
             const url = window.URL.createObjectURL(blob);
             const anchor = document.createElement("a");
             anchor.href = url;
-            anchor.download = finalFileName; // Itt adjuk meg a dinamikus nevet
+            anchor.download = finalFileName; 
             document.body.appendChild(anchor);
             anchor.click();
             document.body.removeChild(anchor);
             
             status.innerText = "Kész!";
-            alert(`Sikeres mentés!\nFájlnév: ${finalFileName}`);
+            alert(`Sikeres mentés!\nFájlnév: ${finalFileName}\n\nTipp: Nyisd meg az Excelt, hogy lásd a frissült százalékokat!`);
 
         } catch (err) {
             console.error(err);
