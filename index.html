@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INTEGRA AUTO-EXPORT V16</title>
+    <title>INTEGRA AUTO-EXPORT V17</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 
@@ -88,8 +88,8 @@
 </div>
 
 <div class="card">
-    <h1 style="color:var(--primary); margin:0;">INTEGRA CHECKLIST v16</h1>
-    <span class="subtitle" style="color:#888; font-size:0.9rem;">Fix: Képletek frissítése</span>
+    <h1 style="color:var(--primary); margin:0;">INTEGRA CHECKLIST v17</h1>
+    <span class="subtitle" style="color:#888; font-size:0.9rem;">Javított fordítás és Számítás</span>
     
     <div class="row-group">
         <div class="input-group" style="flex:2;">
@@ -125,7 +125,6 @@
 
 <script>
     // --- KONFIGURÁCIÓ ---
-    // A GitHub Raw link
     const GITHUB_TEMPLATE_URL = "https://raw.githubusercontent.com/balazsnorberttt-prog/integra-checklist-files/main/DE_PCS_031_02_XXXX_SPSX_Visu%20Checkliste.xlsx";
     const TRANSLATE_API = "https://api.mymemory.translated.net/get";
     
@@ -258,13 +257,15 @@
         document.getElementById('p-op').innerText = document.getElementById('opName').value;
     }
 
-    // --- FORDÍTÁS LOGIKA ---
+    // --- JAVÍTOTT FORDÍTÁS LOGIKA (MT FORCE) ---
     async function translateText(text) {
         if (!text || text.trim() === "") return "";
         try {
-            const url = `${TRANSLATE_API}?q=${encodeURIComponent(text)}&langpair=hu|de`;
+            // &mt=1 KÉNYSZERÍTI a gépi fordítást, ha nincs emberi találat (Kevesebb angol hiba)
+            const url = `${TRANSLATE_API}?q=${encodeURIComponent(text)}&langpair=hu|de&mt=1`;
             const res = await fetch(url);
             const json = await res.json();
+            
             if (json.responseData && json.responseData.translatedText) {
                 return json.responseData.translatedText;
             }
@@ -275,7 +276,7 @@
         }
     }
 
-    // --- AUTOMATIKUS EXPORT FOLYAMAT ---
+    // --- EXPORT FOLYAMAT ---
     async function startAutoExport() {
         const devName = document.getElementById('devName').value;
         const plcNum = document.getElementById('plcNum').value;
@@ -293,20 +294,16 @@
         status.innerText = "Sablon letöltése...";
 
         try {
-            // 1. Sablon letöltése GitHub-ról
             const response = await fetch(GITHUB_TEMPLATE_URL);
-            if(!response.ok) throw new Error("Hiba a sablon letöltésekor. Ellenőrizd az internetkapcsolatot!");
+            if(!response.ok) throw new Error("Hiba a sablon letöltésekor. Ellenőrizd az internetet!");
             const buffer = await response.arrayBuffer();
 
-            // 2. Excel betöltése
             const workbook = new ExcelJS.Workbook();
             await workbook.xlsx.load(buffer);
 
             // --- JAVÍTÁS: KÉPLETEK ÚJRASZÁMOLÁSA ---
-            // Ez a sor kényszeríti az Excelt, hogy megnyitáskor azonnal számolja újra a formulákat!
             workbook.calcProperties.fullCalcOnLoad = true;
 
-            // 3. Adatok feldolgozása és fordítás
             const allItems = document.querySelectorAll('.item-box');
             
             status.innerText = "Adatok írása & Fordítás...";
@@ -323,7 +320,6 @@
                     germanComment = await translateText(hungarianComment);
                 }
 
-                // Munkalap keresése
                 let keywords = [];
                 if (id.startsWith("1.")) keywords = ["Check", "punkte", "1"];
                 else if (id.startsWith("2.")) keywords = ["Visu", "Detail", "2"];
@@ -341,17 +337,20 @@
                     });
 
                     if (targetRow) {
-                        const cellC = targetRow.getCell(3); // OK
-                        const cellD = targetRow.getCell(4); // NOK
-                        const cellF = targetRow.getCell(6); // Comment
+                        const cellC = targetRow.getCell(3); 
+                        const cellD = targetRow.getCell(4); 
+                        const cellF = targetRow.getCell(6); 
                         
                         cellC.value = null; cellD.value = null; cellF.value = null;
 
                         if (stat === "OK") {
                             cellC.value = "x";
+                            // JAVÍTÁS: Szövegként mentjük, hogy a COUNTIF felismerje
+                            cellC.type = ExcelJS.ValueType.String; 
                             cellC.alignment = { horizontal: 'center' };
                         } else if (stat === "NOK") {
                             cellD.value = "x";
+                            cellD.type = ExcelJS.ValueType.String;
                             cellD.alignment = { horizontal: 'center' };
                         }
 
@@ -362,7 +361,6 @@
                 }
             }
 
-            // 4. MENTÉS
             let finalFileName = "DE_PCS_031_02_XXXX_SPSX_Visu Checkliste.xlsx";
             finalFileName = finalFileName.replace("XXXX", devName);
             finalFileName = finalFileName.replace("SPSX", "SPS" + plcNum);
@@ -381,7 +379,7 @@
             document.body.removeChild(anchor);
             
             status.innerText = "Kész!";
-            alert(`Sikeres mentés!\nFájlnév: ${finalFileName}\n\nTipp: Nyisd meg az Excelt, hogy lásd a frissült százalékokat!`);
+            alert(`Sikeres mentés!\n\nFONTOS: A számok frissítéséhez az Excelben kattints a 'Szerkesztés engedélyezése' gombra (sárga sáv)!`);
 
         } catch (err) {
             console.error(err);
