@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INTEGRA CHECKLIST </title>
+    <title>INTEGRA CHECKLIST V22 - FINAL EXPORT</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 
@@ -43,7 +43,7 @@
         
         .details { display: none; margin-top: 15px; border-top: 1px dashed #444; padding-top: 15px; }
         
-        /* --- ÚJ GUIDE BOX STÍLUS --- */
+        /* --- GUIDE BOX STÍLUS --- */
         .guide-box { 
             background: rgba(0,188,212,0.08); 
             color: #e0e0e0; 
@@ -64,7 +64,7 @@
             margin-top: 15px;
             border-radius: 6px;
             border: 1px solid #444;
-            display: none; /* Javascript jeleníti meg ha betöltött */
+            display: none; 
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
         
@@ -126,8 +126,8 @@
 <body>
 
 <div class="card">
-    <h1 style="color:var(--primary); margin:0;">INTEGRA CHECKLIST</h1>
-    <span class="subtitle" style="color:#888; font-size:0.9rem;">V21</span>
+    <h1 style="color:var(--primary); margin:0;">INTEGRA CHECKLIST v22</h1>
+    <span class="subtitle" style="color:#888; font-size:0.9rem;">EGYESÍTETT MEZŐK + PDF NÉV + EXCEL JAVÍTÁS</span>
     
     <div class="row-group">
         <div class="input-group" style="flex:2;">
@@ -166,13 +166,9 @@
 <script>
     // --- KONFIGURÁCIÓ ---
     const GITHUB_TEMPLATE_URL = "https://raw.githubusercontent.com/balazsnorberttt-prog/integra-checklist-files/main/DE_PCS_031_02_XXXX_SPSX_Visu%20Checkliste.xlsx";
-    
-    // KÉPEK MAPPÁJA (A "Képek" mappa URL-kódolt verziója)
-    // FONTOS: A GitHubon a fájlok legyenek .jpg kiterjesztésűek!
     const GITHUB_IMG_BASE_URL = "https://raw.githubusercontent.com/balazsnorberttt-prog/integra-checklist-files/main/K%C3%A9pek/"; 
-
     const TRANSLATE_API = "https://api.mymemory.translated.net/get";
-    const photoStore = {}; // Csak a képadatokat tároljuk, a szöveg a commentből jön
+    const photoStore = {};
 
     // --- ADATBÁZIS ---
     const data = [
@@ -180,12 +176,12 @@
             { 
                 id: "1.1.1", 
                 t: "Hálózati telepítés előírás szerinti?", 
-                g: "<strong>Megfelelő a hálózati telepítés az előírásoknak?</strong><br><br><ul><li>A Windows PC-k (melyek I/O modulokkal egy házban vannak) <strong>utolsó résztvevőként</strong> csatlakozhatnak (EBF, HVO...).</li><li>További kezelő számítógépeket (EBF, TBR) közvetlenül egy <strong>Switch-re</strong> kell csatlakoztatni (ami az Automation Access Switch portbővítése, pl. XC200 a +H111-ben), vagy közvetlenül az Automation-Access-Switch-re.</li></ul>" 
+                g: "<strong>Megfelelő a hálózati telepítés az előírásoknak?</strong><br><br><ul><li>Windows PC-k (melyek I/O modulokkal egy házban vannak) <strong>utolsó résztvevőként</strong> csatlakozhatnak (EBF, HVO...).</li><li>További kezelő számítógépeket (EBF, TBR) közvetlenül egy <strong>Switch-re</strong> kell csatlakoztatni (ami az Automation Access Switch portbővítése, pl. XC200 a +H111-ben), vagy közvetlenül az Automation-Access-Switch-re.</li></ul>" 
             },
             { 
                 id: "1.1.2", 
                 t: "Gépnév egyedi és egyeztetve?", 
-                g: "<strong>Rechnername (Számítógépnév) ellenőrzése:</strong><br><br><ul><li>A számítógép neve egyértelmű és egyeztetve lett?</li><li>A Windows PC-k I/O modulokkal azonos házban utolsó résztvevőként vannak csatlakoztatva?</li></ul>" 
+                g: "<strong>Számítógépnév ellenőrzése:</strong><br><br><ul><li>A számítógép neve egyértelmű és egyeztetve lett?</li><li>A Windows PC-k I/O modulokkal azonos házban utolsó résztvevőként vannak csatlakoztatva?</li></ul>" 
             },
             { 
                 id: "1.1.3", 
@@ -197,7 +193,7 @@
             { 
                 id: "1.2.1", 
                 t: "Image Verzió aktuális?", 
-                g: "<strong>Image verzió ellenőrzése (IT Image PN):</strong><br><br><ul><li>Melyik verzió van telepítve?</li><li>Ez a verzió aktuális?</li></ul><br><strong>Ellenőrzés helye:</strong><br><code>D:\\Tools\\OS-Info</code>" 
+                g: "<strong>Image verzió ellenőrzése (IT Image PN):</strong><br><br><ul><li>Melyik verzió van telepítve és ez aktuális-e?</li></ul><br><strong>Ellenőrzés helye:</strong><br><code>D:\\Tools\\OS-Info</code>" 
             },
             { 
                 id: "1.2.2", 
@@ -240,9 +236,9 @@
             { id: "1.6.3", t: "IntegraShell konfiguráció?", g: "<strong>IntegraShell:</strong><br><br><ul><li>Helyesen indul el az IntegraShell?</li><li>Minden konfiguráció megfelelő?</li></ul>" },
             { id: "1.6.4", t: "EKM kapcsolat?", g: "<strong>Hozzáférések:</strong><br><br><ul><li>Helyesen van konfigurálva a hozzáférés-védelem?</li><li>Van kapcsolat az EKM szerverhez?</li></ul>" },
             { id: "1.6.5", t: "isiSave beállítva?", g: "<strong>Archiválás (isiSave):</strong><br><br><ul><li>Helyesen van konfigurálva az archiváló szerver?</li><li>A felhasználói adatok mentésre kerülnek?</li><li>Kapcsolat: ISI-Save, ISI-Save CMW</li></ul>" },
-            { id: "1.6.6", t: "Index-Szerver OK?", g: "<strong>Index-Szerver:</strong><br><br><ul><li>Helyesen van beállítva az Index-Szerver?</li></ul>" },
-            { id: "1.6.7", t: "DFI-Szerver OK?", g: "<strong>DFI-Szerver:</strong><br><br><ul><li>Helyesen van beállítva a DFI-Szerver?</li></ul>" },
-            { id: "1.6.8", t: "SIS Log tiszta?", g: "<strong>SIS-Szerver Logok:</strong><br><br><ul><li>Vannak hibaüzenetek a SIS-Szerver naplófájljaiban?</li></ul><br><strong>Log fájl helye:</strong><br><code>D:\\integra\\System\\Logs\\SisServer.csv</code>" },
+            { id: "1.6.6", t: "Index-Szerver OK?", g: "<strong>Index-Szerver:</strong><br><br><ul><li>Ha a Systemmanager-ben látjuk Online a PC-ket, akkor jó az index-szerver beállítása.</li><li>A topológiában nincs ismeretlen gép.</li></ul>" },
+            { id: "1.6.7", t: "DFI-Szerver OK?", g: "<strong>DFI-Szerver:</strong><br><br><ul><li>Trend-ben (integraView Admin) az Admin\\Profile -> SPS\\Bearbeiten alatt a Bearbeiten-t ellenőrizni.</li></ul>" },
+            { id: "1.6.8", t: "SIS Log tiszta?", g: "<strong>SIS-Szerver Logok:</strong><br><br><ul><li>Vannak hibaüzenetek a SIS-Szerver naplófájljaiban?</li></ul><br><strong>Log fájl helye:</strong><br><code>D:\\integra\\System\\Log\\SisServer.csv</code>" },
             { id: "1.6.9", t: "Mappastruktúra OK?", g: "<strong>Könyvtárszerkezet:</strong><br><br><ul><li>A struktúra az előírásoknak megfelelően lett létrehozva?</li><li>A projektek ennek megfelelően vannak tárolva?</li></ul><br><strong>Példa útvonal:</strong><br><code>D:\\CMWProjects\\MO\\LFA1\\LFA1SPS1.IDPRO</code>" },
             { id: "1.6.10", t: "Szemét törölve?", g: "<strong>Takarítás:</strong><br><br><ul><li>Töröltek minden régi fájlt a projekt mappából?</li><li>Csak a <strong>&lt;Berendezés&gt;.S7TIA</strong> fájl lehet SPS-enként!</li></ul>" },
             { id: "1.6.11", t: "Vírusirtó frissül?", g: "<strong>Vírusvédelem:</strong><br><br><ul><li>Automatikusan frissül a vírusirtó program?</li></ul>" }
@@ -288,7 +284,6 @@
             sect.items.forEach(item => {
                 const uid = item.id.replace(/\./g, '_');
                 
-                // Kép URL generálása (JPG kiterjesztés!)
                 let guideImageHtml = "";
                 if(GITHUB_IMG_BASE_URL.length > 5) {
                     const imgUrl = GITHUB_IMG_BASE_URL + item.id + ".jpg"; 
@@ -311,7 +306,7 @@
                                 ${item.g}
                                 ${guideImageHtml}
                             </div>
-                            <textarea placeholder="Megjegyzés" id="com-${uid}"></textarea>
+                            <textarea placeholder="Megjegyzés (Excelbe és PDF fotó alá)..." id="com-${uid}"></textarea>
                         </div>
 
                         <div class="photo-section" id="pho-${uid}">
@@ -320,7 +315,7 @@
                             <button class="btn-action" style="background:#333; color:var(--primary); margin-bottom:5px;" onclick="document.getElementById('inp-file-${uid}').click()">
                                 📤 FOTÓ FELTÖLTÉSE
                             </button>
-                            </div>
+                        </div>
                     </div>
                 `;
             });
@@ -329,7 +324,6 @@
         });
     }
 
-    // --- FELHASZNÁLÓI INTERAKCIÓK ---
     function toggleDetails(uid) {
         const el = document.getElementById(`det-${uid}`);
         el.style.display = (el.style.display === 'block') ? 'none' : 'block';
@@ -340,7 +334,6 @@
         el.style.display = (el.style.display === 'block') ? 'none' : 'block';
     }
 
-    // --- TÖMÖRÍTÉS FUNKCIÓ ---
     function compressImage(file, maxWidth, quality) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -352,18 +345,14 @@
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
-
                     if (width > maxWidth) {
                         height *= maxWidth / width;
                         width = maxWidth;
                     }
-
                     canvas.width = width;
                     canvas.height = height;
-                    
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    
                     resolve(canvas.toDataURL('image/jpeg', quality));
                 };
                 img.onerror = error => reject(error);
@@ -372,14 +361,12 @@
         });
     }
 
-    // --- FOTÓ MENTÉS ---
     async function savePhoto(event, uid) {
         const file = event.target.files[0];
         if (file) {
             const btn = document.querySelector(`#pho-${uid} .btn-action`);
             const originalText = btn.innerText;
             btn.innerText = "⏳ Tömörítés...";
-
             try {
                 const compressedBase64 = await compressImage(file, 1200, 0.7);
                 const img = document.getElementById(`img-prev-${uid}`);
@@ -388,7 +375,6 @@
                 document.getElementById(`btn-p-${uid}`).classList.add('btn-has-photo');
                 if(!photoStore[uid]) photoStore[uid] = {};
                 photoStore[uid].img = compressedBase64;
-
             } catch (err) {
                 console.error("Hiba:", err);
                 alert("Hiba a kép feldolgozásakor!");
@@ -420,10 +406,10 @@
         // Placeholder
     }
 
-    // --- PDF GENERÁLÁS (JAVÍTVA: A commentet használja fotó leírásként is) ---
+    // --- PDF GENERÁLÁS: HACK A FÁJLNÉVHEZ ---
     function generateModernPDF() {
-        const dev = document.getElementById('devName').value || "Nincs megadva";
-        const plc = document.getElementById('plcNum').value || "-";
+        const dev = document.getElementById('devName').value || "Berendezes";
+        const plc = document.getElementById('plcNum').value || "0";
         const op = document.getElementById('opName').value || "-";
         const score = document.getElementById('scoreDisplay').innerText;
         const date = new Date().toLocaleDateString('hu-HU');
@@ -436,14 +422,13 @@
             const idTag = box.querySelector('.id-tag').innerText;
             const text = box.querySelector('.q-text').innerText;
             const status = box.getAttribute('data-status');
-            const comment = document.getElementById(`com-${uid}`).value; // EZ A KÖZÖS MEZŐ
+            const comment = document.getElementById(`com-${uid}`).value; 
             
             if (!status) return; 
 
             const photoData = photoStore[uid];
             let photoHtml = "";
             if (photoData && photoData.img) {
-                // Itt a 'comment'-et használjuk a fotó leírásaként
                 photoHtml = `
                     <div class="rb-photo-row">
                         <img src="${photoData.img}" class="rb-img">
@@ -476,7 +461,7 @@
                 <h1 class="report-title">INTEGRA JEGYZŐKÖNYV</h1>
                 <div class="report-meta">
                     Dátum: ${date}<br>
-                    Generálva: Integra Check v21
+                    Generálva: Integra Check v22
                 </div>
             </div>
 
@@ -504,10 +489,17 @@
             </div>
         `;
 
+        // PDF FÁJLNÉV TRÜKK: Az oldal címét ideiglenesen átírjuk
+        const originalTitle = document.title;
+        document.title = `${dev}_SPS${plc}_Jegyzokonyv`;
+        
         window.print();
+        
+        // Visszaállítjuk
+        document.title = originalTitle;
     }
 
-    // --- EXCEL EXPORT ---
+    // --- EXCEL EXPORT (Letöltés javítva) ---
     async function translateText(text) {
         if (!text || text.trim() === "") return "";
         try {
@@ -555,7 +547,6 @@
                 const stat = item.getAttribute('data-status');
                 const uid = id.replace(/\./g, '_');
                 
-                // ITT OLVASSUK KI A KÖZÖS MEZŐT
                 const hungarianComment = document.getElementById(`com-${uid}`).value;
                 
                 let germanComment = "";
@@ -604,7 +595,7 @@
             }
 
             let finalFileName = "DE_PCS_031_02_XXXX_SPSX_Visu Checkliste.xlsx";
-            finalFileName = finalFileName.replace("XXXX", devName);
+            finalFileName = finalFileName.replace("XXXX", devName.replace(/[^a-z0-9]/gi, '_'));
             finalFileName = finalFileName.replace("SPSX", "SPS" + plcNum);
 
             btn.innerHTML = '<div class="spinner"></div> MENTÉS...';
@@ -612,16 +603,23 @@
             const outBuffer = await workbook.xlsx.writeBuffer();
             const blob = new Blob([outBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
             
+            // Biztonságosabb letöltés indítás
             const url = window.URL.createObjectURL(blob);
             const anchor = document.createElement("a");
             anchor.href = url;
             anchor.download = finalFileName; 
             document.body.appendChild(anchor);
+            
+            alert(`A fájl letöltése elindul: ${finalFileName}\n\nHa nem kéri a helyet, nézd meg a 'Letöltések' mappát!`);
+            
             anchor.click();
-            document.body.removeChild(anchor);
+            
+            setTimeout(() => {
+                document.body.removeChild(anchor);
+                window.URL.revokeObjectURL(url);
+            }, 100);
             
             status.innerText = "Kész!";
-            alert(`Sikeres mentés!\n\nFONTOS: A számok frissítéséhez az Excelben kattints a 'Szerkesztés engedélyezése' gombra (sárga sáv)!`);
 
         } catch (err) {
             console.error(err);
@@ -638,4 +636,3 @@
 
 </body>
 </html>
-
