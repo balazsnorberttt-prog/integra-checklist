@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INTEGRA CHECKLIST V20</title>
+    <title>INTEGRA CHECKLIST </title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 
@@ -43,7 +43,7 @@
         
         .details { display: none; margin-top: 15px; border-top: 1px dashed #444; padding-top: 15px; }
         
-        /* --- ÚJ GUIDE BOX STÍLUS (TAGOLT) --- */
+        /* --- ÚJ GUIDE BOX STÍLUS --- */
         .guide-box { 
             background: rgba(0,188,212,0.08); 
             color: #e0e0e0; 
@@ -54,7 +54,6 @@
             font-size: 0.95rem;
             line-height: 1.6;
         }
-        /* HTML Listák formázása a guide-boxon belül */
         .guide-box ul { padding-left: 20px; margin: 5px 0 10px 0; }
         .guide-box li { margin-bottom: 5px; }
         .guide-box strong { color: var(--primary); font-weight: 700; }
@@ -65,7 +64,7 @@
             margin-top: 15px;
             border-radius: 6px;
             border: 1px solid #444;
-            display: none;
+            display: none; /* Javascript jeleníti meg ha betöltött */
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
         
@@ -127,8 +126,8 @@
 <body>
 
 <div class="card">
-    <h1 style="color:var(--primary); margin:0;">INTEGRA CHECKLIST v20</h1>
-    <span class="subtitle" style="color:#888; font-size:0.9rem;">PROFESSIONAL EDITION | JPG SUPPORT</span>
+    <h1 style="color:var(--primary); margin:0;">INTEGRA CHECKLIST v21</h1>
+    <span class="subtitle" style="color:#888; font-size:0.9rem;">EGYESÍTETT MEZŐK + KÉP TÁMOGATÁS</span>
     
     <div class="row-group">
         <div class="input-group" style="flex:2;">
@@ -168,15 +167,14 @@
     // --- KONFIGURÁCIÓ ---
     const GITHUB_TEMPLATE_URL = "https://raw.githubusercontent.com/balazsnorberttt-prog/integra-checklist-files/main/DE_PCS_031_02_XXXX_SPSX_Visu%20Checkliste.xlsx";
     
-    // FONTOS: Images mappa, és a JPG kód lejjebb beállítva!
-    const GITHUB_IMG_BASE_URL = "https://raw.githubusercontent.com/balazsnorberttt-prog/integra-checklist-files/main/images/"; 
+    // KÉPEK MAPPÁJA (A "Képek" mappa URL-kódolt verziója)
+    // FONTOS: A GitHubon a fájlok legyenek .jpg kiterjesztésűek!
+    const GITHUB_IMG_BASE_URL = "https://raw.githubusercontent.com/balazsnorberttt-prog/integra-checklist-files/main/K%C3%A9pek/"; 
 
     const TRANSLATE_API = "https://api.mymemory.translated.net/get";
-    const photoStore = {};
+    const photoStore = {}; // Csak a képadatokat tároljuk, a szöveg a commentből jön
 
-    // --- ADATBÁZIS (HTML FORMÁZOTT LEÍRÁSOKKAL) ---
-    // A 'g' mezőben a G oszlop pontos adatai szerepelnek
-    
+    // --- ADATBÁZIS ---
     const data = [
         { cat: "1.1.0 HÁLÓZAT", items: [
             { 
@@ -313,7 +311,7 @@
                                 ${item.g}
                                 ${guideImageHtml}
                             </div>
-                            <textarea placeholder="Excel Megjegyzés (Magyar)..." id="com-${uid}"></textarea>
+                            <textarea placeholder="Megjegyzés (Excelbe és PDF fotó alá)..." id="com-${uid}"></textarea>
                         </div>
 
                         <div class="photo-section" id="pho-${uid}">
@@ -322,8 +320,7 @@
                             <button class="btn-action" style="background:#333; color:var(--primary); margin-bottom:5px;" onclick="document.getElementById('inp-file-${uid}').click()">
                                 📤 FOTÓ FELTÖLTÉSE
                             </button>
-                            <textarea id="p-desc-${uid}" placeholder="Fotó leírása (ez kerül a PDF-be)..." oninput="savePhotoDesc('${uid}')"></textarea>
-                        </div>
+                            </div>
                     </div>
                 `;
             });
@@ -375,7 +372,7 @@
         });
     }
 
-    // --- MÓDOSÍTOTT FOTÓ MENTÉS ---
+    // --- FOTÓ MENTÉS ---
     async function savePhoto(event, uid) {
         const file = event.target.files[0];
         if (file) {
@@ -401,12 +398,6 @@
         }
     }
 
-    function savePhotoDesc(uid) {
-        const text = document.getElementById(`p-desc-${uid}`).value;
-        if(!photoStore[uid]) photoStore[uid] = {};
-        photoStore[uid].desc = text;
-    }
-
     function setStatus(uid, s) {
         const box = document.getElementById(`box-${uid}`);
         const btns = box.querySelectorAll('.btn-row button');
@@ -429,7 +420,7 @@
         // Placeholder
     }
 
-    // --- PDF GENERÁLÁS ---
+    // --- PDF GENERÁLÁS (JAVÍTVA: A commentet használja fotó leírásként is) ---
     function generateModernPDF() {
         const dev = document.getElementById('devName').value || "Nincs megadva";
         const plc = document.getElementById('plcNum').value || "-";
@@ -445,18 +436,20 @@
             const idTag = box.querySelector('.id-tag').innerText;
             const text = box.querySelector('.q-text').innerText;
             const status = box.getAttribute('data-status');
-            const comment = document.getElementById(`com-${uid}`).value;
+            const comment = document.getElementById(`com-${uid}`).value; // EZ A KÖZÖS MEZŐ
+            
             if (!status) return; 
 
             const photoData = photoStore[uid];
             let photoHtml = "";
             if (photoData && photoData.img) {
+                // Itt a 'comment'-et használjuk a fotó leírásaként
                 photoHtml = `
                     <div class="rb-photo-row">
                         <img src="${photoData.img}" class="rb-img">
                         <div class="rb-desc">
-                            <span class="rb-desc-label">FOTÓ LEÍRÁS:</span>
-                            ${photoData.desc || "Nincs leírás megadva."}
+                            <span class="rb-desc-label">MEGJEGYZÉS / FOTÓ INFO:</span>
+                            ${comment || "Nincs leírás megadva."}
                         </div>
                     </div>
                 `;
@@ -469,7 +462,7 @@
                         <span class="rb-status ${status}">${status}</span>
                     </div>
                     <div class="rb-text">${text}</div>
-                    ${comment ? `<div class="rb-comment">Megjegyzés: ${comment}</div>` : ''}
+                    ${(comment && !photoData) ? `<div class="rb-comment">Megjegyzés: ${comment}</div>` : ''} 
                     ${photoHtml}
                 </div>
             `;
@@ -483,7 +476,7 @@
                 <h1 class="report-title">INTEGRA JEGYZŐKÖNYV</h1>
                 <div class="report-meta">
                     Dátum: ${date}<br>
-                    Generálva: Integra Check v20
+                    Generálva: Integra Check v21
                 </div>
             </div>
 
@@ -561,6 +554,8 @@
                 const id = item.getAttribute('data-id');
                 const stat = item.getAttribute('data-status');
                 const uid = id.replace(/\./g, '_');
+                
+                // ITT OLVASSUK KI A KÖZÖS MEZŐT
                 const hungarianComment = document.getElementById(`com-${uid}`).value;
                 
                 let germanComment = "";
