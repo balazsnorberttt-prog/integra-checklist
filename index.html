@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INTEGRA AUTO-EXPORT V18 - PHOTO</title>
+    <title>INTEGRA CHECKLIST V18 - HU</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 
     <style>
-        /* --- EREDETI STÍLUSOK (SÖTÉT TÉMA) --- */
+        /* --- STÍLUSOK (SÖTÉT TÉMA) --- */
         :root {
             --bg: #121212; --card: #1e1e1e; --primary: #00bcd4;
             --success: #00e676; --danger: #ff5252; --excel: #21a366; --text: #ffffff;
@@ -35,14 +35,27 @@
         .btn-row { display: flex; gap: 10px; margin-top: 15px; }
         button { flex: 1; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: #fff; transition: 0.2s; }
         .btn-guide { flex: 0 0 50px; background: #333; color: var(--primary); }
-        .btn-photo { flex: 0 0 50px; background: #444; color: #fff; position: relative; } /* ÚJ GOMB */
+        .btn-photo { flex: 0 0 50px; background: #444; color: #fff; position: relative; }
         .btn-ok { background: #1b5e20; opacity: 0.6; }
         .btn-nok { background: #b71c1c; opacity: 0.6; }
         .btn-ok.active { background: var(--success); color: #000; opacity: 1; transform: scale(1.02); }
         .btn-nok.active { background: var(--danger); color: #fff; opacity: 1; transform: scale(1.02); }
         
         .details { display: none; margin-top: 15px; border-top: 1px dashed #444; padding-top: 15px; }
-        .guide-box { background: rgba(0,188,212,0.1); color: #ddd; padding: 12px; border-radius: 6px; margin-bottom: 15px; white-space: pre-line; border-left: 2px solid var(--primary); }
+        
+        /* Frissített Guide Box: sortörések kezelése */
+        .guide-box { 
+            background: rgba(0,188,212,0.1); 
+            color: #e0e0e0; 
+            padding: 12px; 
+            border-radius: 6px; 
+            margin-bottom: 15px; 
+            white-space: pre-wrap; /* Sortörések megtartása */
+            border-left: 2px solid var(--primary); 
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
         textarea { width: 100%; background: #111; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 6px; min-height: 60px; box-sizing: border-box; font-family: sans-serif; }
         
         /* --- FOTÓ MODUL --- */
@@ -68,68 +81,30 @@
         .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid #000; border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite; margin-right: 5px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* --- MODERN PRINT LAYOUT (PDF) --- */
+        /* --- PDF LAYOUT --- */
         #print-container { display: none; }
-
         @media print {
-            /* Minden eredeti UI elemet elrejtünk */
             body * { visibility: hidden; }
             .floating-footer, .card, #root, .section-header { display: none !important; }
             body { background: #fff; color: #000; padding: 0; margin: 0; -webkit-print-color-adjust: exact; }
-            
-            /* Csak a Print Container látszik */
             #print-container, #print-container * { visibility: visible; display: block; }
-            #print-container { 
-                position: absolute; left: 0; top: 0; width: 100%; 
-                font-family: 'Helvetica', 'Arial', sans-serif;
-            }
-
-            /* Jelentés Design */
-            .report-header { 
-                border-bottom: 2px solid #00bcd4; padding-bottom: 10px; margin-bottom: 20px; 
-                display: flex !important; justify-content: space-between; align-items: flex-end;
-            }
+            #print-container { position: absolute; left: 0; top: 0; width: 100%; font-family: 'Helvetica', 'Arial', sans-serif; }
+            .report-header { border-bottom: 2px solid #00bcd4; padding-bottom: 10px; margin-bottom: 20px; display: flex !important; justify-content: space-between; align-items: flex-end; }
             .report-title { font-size: 24px; font-weight: bold; color: #333; margin: 0; }
             .report-meta { font-size: 12px; color: #666; text-align: right; }
-            
-            .report-summary { 
-                display: flex !important; gap: 20px; margin-bottom: 30px; 
-                background: #f0f0f0; padding: 15px; border-radius: 8px;
-            }
+            .report-summary { display: flex !important; gap: 20px; margin-bottom: 30px; background: #f0f0f0; padding: 15px; border-radius: 8px; }
             .sum-item { flex: 1; text-align: center; }
             .sum-val { font-size: 18px; font-weight: bold; }
             .sum-lbl { font-size: 10px; text-transform: uppercase; color: #777; }
-
-            /* A dokumentum nem eshet szét! */
-            .report-block {
-                margin-bottom: 25px;
-                border: 1px solid #ddd;
-                border-radius: 6px;
-                padding: 15px;
-                page-break-inside: avoid; /* KULCSFONTOSSÁGÚ: Nem vágja el a lap alja */
-                break-inside: avoid;
-                background: #fff;
-                box-shadow: none;
-            }
-
-            .rb-header { 
-                display: flex !important; justify-content: space-between; 
-                border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 10px;
-            }
+            .report-block { margin-bottom: 25px; border: 1px solid #ddd; border-radius: 6px; padding: 15px; page-break-inside: avoid; break-inside: avoid; background: #fff; }
+            .rb-header { display: flex !important; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 10px; }
             .rb-id { font-weight: bold; color: #00bcd4; }
             .rb-status { font-weight: bold; text-transform: uppercase; }
             .rb-status.OK { color: #008000; }
             .rb-status.NOK { color: #cc0000; }
-
             .rb-text { font-size: 14px; margin-bottom: 5px; font-weight: bold; }
             .rb-comment { font-size: 12px; font-style: italic; color: #555; margin-top: 5px; }
-
-            /* Fotó elrendezés a PDF-ben */
-            .rb-photo-row { 
-                display: flex !important; gap: 15px; margin-top: 10px; 
-                align-items: flex-start; 
-                border-top: 1px dotted #ccc; padding-top: 10px;
-            }
+            .rb-photo-row { display: flex !important; gap: 15px; margin-top: 10px; align-items: flex-start; border-top: 1px dotted #ccc; padding-top: 10px; }
             .rb-img { width: 140px; height: 100px; object-fit: contain; border: 1px solid #eee; background: #fafafa; }
             .rb-desc { flex: 1; font-size: 11px; color: #333; }
             .rb-desc-label { font-weight: bold; display: block; margin-bottom: 3px; color: #00bcd4; }
@@ -174,73 +149,76 @@
     </div>
 </div>
 
-<div id="print-container">
-    </div>
+<div id="print-container"></div>
 
 <script>
     // --- KONFIGURÁCIÓ ---
     const GITHUB_TEMPLATE_URL = "https://raw.githubusercontent.com/balazsnorberttt-prog/integra-checklist-files/main/DE_PCS_031_02_XXXX_SPSX_Visu%20Checkliste.xlsx";
     const TRANSLATE_API = "https://api.mymemory.translated.net/get";
     
-    // Globális tároló a fotóknak és leírásaiknak (UID alapján)
     const photoStore = {};
 
-    // --- ADATBÁZIS ---
+    // --- ADATBÁZIS (FRISSÍTETT MAGYAR RÉSZLETES LEÍRÁSOKKAL) ---
     const data = [
         { cat: "1.1.0 HÁLÓZAT", items: [
-            { id: "1.1.1", t: "Hálózati telepítés előírás szerinti?", g: "Online topológiát megnyitni és ellenőrizni..." },
-            { id: "1.1.2", t: "Gépnév egyedi és egyeztetve?", g: "Gépnév egyeztetve és egyértelmű" },
-            { id: "1.1.3", t: "Ondeso tool futott?", g: "Ondeso tool rendben fut rajta..." }
+            { id: "1.1.1", t: "Hálózati telepítés előírás szerinti?", g: "Megfelelő-e a hálózati telepítés az előírásoknak?\n\n- Windows PC-k, amelyek I/O modulokkal egy házban találhatók, utolsó résztvevőként csatlakozhatnak (EBF, HVO, …).\n- További kezelő számítógépeket (EBF, TBR) közvetlenül egy olyan Switch-re kell csatlakoztatni, amely az Automation Access Switch portbővítésére szolgál (pl. XC200 switch a +H111 állomásszekrényben), vagy közvetlenül az Automation-Access-Switch-re." },
+            { id: "1.1.2", t: "Gépnév egyedi és egyeztetve?", g: "Egyértelmű a számítógép neve és egyeztetve lett?\n\n- Windows PC-k I/O modulokkal azonos házban utolsó résztvevőként csatlakozhatnak." },
+            { id: "1.1.3", t: "Ondeso tool futott?", g: "Az 'Ondeso' eszköz megfelelően lett futtatva?\n\n- Hálózat és számítógépnév, illetve tartomány (Domain) illesztése.\n- Illesztés a szerverrendszerekhez." }
         ]},
         { cat: "1.2.0 SZOFTVER", items: [
-            { id: "1.2.1", t: "Image Verzió aktuális?", g: "OS-Info-t elindítani..." },
-            { id: "1.2.2", t: "TIA Portal verzió megfelelő?", g: "TIA verzió ellenőrzés V16 UB" },
-            { id: "1.2.3", t: "Safety verzió megfelelő?", g: "TIA verzió ellenőrzés" },
-            { id: "1.2.4", t: "Integra Designer verzió?", g: "6.9.7.0 vagy ellenőrizni a gépeket..." }
+            { id: "1.2.1", t: "Image Verzió aktuális?", g: "Melyik Image Verzió (IT Image PN) van telepítve, és ez aktuális-e?\n\nEllenőrzés helye: D:\\Tools\\OS-Info" },
+            { id: "1.2.2", t: "TIA Portal verzió megfelelő?", g: "A SIMATIC STEP7 Professional (TIA-Portal) verziója megfelel az előírásnak?\n\nLásd: 000_B3.26.03_Projektierversion-Profinet-Komponenten_V60.xx.xls" },
+            { id: "1.2.3", t: "Safety verzió megfelelő?", g: "A SIMATIC STEP7 Safety (TIA-Portal) verziója megfelel az előírásnak?\n\nLásd: 000_B3.26.03_Projektierversion-Profinet-Komponenten_V60.xx.xls" },
+            { id: "1.2.4", t: "Integra Designer verzió?", g: "Melyik Integra Designer verzió van telepítve, és megfelel-e az előírásnak?" }
         ]},
         { cat: "1.3.0 HARDWARE", items: [
-             { id: "1.3.1", t: "PC feliratozva?", g: "Pult jelölés (Nyomtatva vagy gravírozva)" }
+             { id: "1.3.1", t: "PC feliratozva?", g: "Fel van iratozva a PC névvel?\nMegfelel a vizualizáció felépítése és telepítése az aktuális előírásoknak?" }
         ]},
         { cat: "1.4.0 RENDSZER", items: [
-            { id: "1.4.1", t: "Rendszerdiagnosztika hiba nélkül?", g: "Integra System Manager..." },
-            { id: "1.4.2", t: "IntegraCheck OK?", g: "VMC, Vizualizáció: Menü/IntegraCheck" },
-            { id: "1.4.3", t: "Mozgásképek rendben?", g: "Minden Visu-ban ellenőrizni..." },
-            { id: "1.4.4", t: "Interfész képek rendben?", g: "Mozgás képernyő ikonja mellett..." },
-            { id: "1.4.5", t: "Designer Templates OK?", g: "Ha a System zöld, akkor jó..." },
-            { id: "1.4.6", t: "Scriptek dokumentálva?", g: "idPro projektet letölteni..." },
-            { id: "1.4.7", t: "Nyelv beállítva?", g: "Ellenőrizni a nyelvváltást" }
+            { id: "1.4.1", t: "Rendszerdiagnosztika hiba nélkül?", g: "Nincsenek hibák a rendszeráttekintő berendezés-diagnosztikában (Systemübersicht Anlagendiagnose)?" },
+            { id: "1.4.2", t: "IntegraCheck OK?", g: "Rendszeráttekintő berendezés-diagnosztika:\nRendben van az IntegraCheck?" },
+            { id: "1.4.3", t: "Mozgásképek rendben?", g: "Megvannak a mozgásképek (Bewegungsbilder) és megfelelnek az előírásnak?" },
+            { id: "1.4.4", t: "Interfész képek rendben?", g: "Megvannak az interfész képek (Schnittstellenbilder) és megfelelnek az előírásnak?" },
+            { id: "1.4.5", t: "Designer Templates OK?", g: "Nem lettek módosítva az aktuális Designer sablonok (Templates), Designer modulok és a SystemTemplates.zip fájl?" },
+            { id: "1.4.6", t: "Scriptek dokumentálva?", g: "Használtak szkripteket a Designer projektben, és ezek dokumentálva vannak?" },
+            { id: "1.4.7", t: "Nyelv beállítva?", g: "A vizualizáció nyelvi beállításai a tervezés megkezdése előtt módosítva lettek?" }
+        ]},
+        { cat: "1.5.0 VISU - PROJEKTIERUNG", items: [
+             { id: "1.5.1", t: "Lásd Visu - Detail", g: "Lásd a részletes vizualizációs ellenőrzőlistát (Visu - Detail)." }
         ]},
         { cat: "1.6.0 KIEGÉSZÍTÉSEK", items: [
-            { id: "1.6.1", t: "Mintaprojektek betartva?", g: "RB, MO, FT előírások" },
-            { id: "1.6.2", t: "Tech paraméterek jó helyen?", g: "D:\\CMWProjekt mappa" },
-            { id: "1.6.3", t: "IntegraShell konfiguráció?", g: "Tiltja a programok futtatását..." },
-            { id: "1.6.4", t: "EKM kapcsolat?", g: "Szerverről kapja..." },
-            { id: "1.6.5", t: "isiSave beállítva?", g: "isiSave program ellenőrzés" },
-            { id: "1.6.6", t: "Index-Szerver OK?", g: "Systemmanager online..." },
-            { id: "1.6.8", t: "SIS Log tiszta?", g: "D:\\integra\\System\\Logs\\SisServer.csv" },
-            { id: "1.6.9", t: "Mappastruktúra OK?", g: "CMWProjekt mappa felépítése" },
-            { id: "1.6.10", t: "Szemét törölve?", g: "Nincs más TIA projekt" },
-            { id: "1.6.11", t: "Vírusirtó frissül?", g: "Antivírus szoftver telepítve" }
+            { id: "1.6.1", t: "Mintaprojektek betartva?", g: "Figyelembe vették a mintaprojektek (RB, MO, FT) előírásait és a rendelkezésre bocsátott sablonokat a megbeszélések szerint?" },
+            { id: "1.6.2", t: "Tech paraméterek jó helyen?", g: "Minden technológiai paraméter / program az előírt könyvtárakban van tárolva?\n(Pl. D:\\CMWProjects mappa)" },
+            { id: "1.6.3", t: "IntegraShell konfiguráció?", g: "Helyesen indul el az IntegraShell, és minden megfelelően van konfigurálva?" },
+            { id: "1.6.4", t: "EKM kapcsolat?", g: "Helyesen van konfigurálva a hozzáférés-védelem?\n(Kapcsolat az EKM szerverhez)" },
+            { id: "1.6.5", t: "isiSave beállítva?", g: "Helyesen van konfigurálva az archiváló szerver, és a felhasználói adatok mentésre kerültek?\n(Kapcsolat ISI-Save, ISI-Save CMW)" },
+            { id: "1.6.6", t: "Index-Szerver OK?", g: "Helyesen van beállítva az Index-Szerver?" },
+            { id: "1.6.7", t: "DFI-Szerver OK?", g: "Helyesen van beállítva a DFI-Szerver?" },
+            { id: "1.6.8", t: "SIS Log tiszta?", g: "Vannak hibaüzenetek a SIS-Szerver naplófájljaiban (Log-fájlok)?\n(D:\\integra\\System\\Logs\\SisServer.csv)" },
+            { id: "1.6.9", t: "Mappastruktúra OK?", g: "A könyvtárszerkezet az előírásoknak megfelelően lett létrehozva, és a projektek ennek megfelelően vannak tárolva?\nPl: D:\\CMWProjects\\MO\\LFA1\\LFA1SPS1.IDPRO" },
+            { id: "1.6.10", t: "Szemét törölve?", g: "Töröltek minden régi fájlt a projekt mappából?\n(Csak <Berendezés>.S7TIA fájl lehet SPS-enként)" },
+            { id: "1.6.11", t: "Vírusirtó frissül?", g: "Automatikusan frissül a vírusirtó program?" }
         ]},
         { cat: "2.1.0 PLC (SPS)", items: [
-            { id: "2.1.1", t: "Minden PLC terület látszik?", g: "Terület választó képernyő" },
-            { id: "2.1.2", t: "Minden területnek van vizuja?", g: "SPS terület vizualizáció" },
-            { id: "2.1.3", t: "Full HD felbontás?", g: "Projekttervezőben Full HD" },
-            { id: "2.1.4", t: "Calibri 10 Bold?", g: "Betűtípus ellenőrzés" },
-            { id: "2.1.5", t: "Pult 99 (Nyers) ablak?", g: "Helyettesítő ablak funkció" },
-            { id: "2.1.6", t: "PNG átlátszó képek?", g: "Kb. 100 KB fájlméret" }
+            { id: "2.1.1", t: "Minden PLC terület látszik?", g: "Minden SPS terület projektálva van a berendezés-kiválasztásban?" },
+            { id: "2.1.2", t: "Minden területnek van vizuja?", g: "Léteznek projektált vizualizációs képek minden SPS területhez?" },
+            { id: "2.1.3", t: "Full HD felbontás?", g: "Az Integra Projekt Varázslóban (Wizard) a Full HD felbontást választották ki?" },
+            { id: "2.1.4", t: "Calibri 10 Bold?", g: "Minden elemnél a szabványos betűtípust (Calibri, Félkövér, 10-es méret, „Alignment taLeftJustify”) használták?" },
+            { id: "2.1.5", t: "Pult 99 (Nyers) ablak?", g: "A fölérendelt Pult 99 (Karosszéria/Rohbau) esetében az áttekintő képet a helyettesítő ablak funkcióval jelenítették meg?" },
+            { id: "2.1.6", t: "PNG átlátszó képek?", g: "A képek megjelenítése PNG formátumban, átlátszó háttérrel, max. kb. 100KB fájlmérettel történt?\n\nElőnyben kell részesíteni a CAD rajzokat, pl.: funkcionális elrendezési tervekből, szerszám áttekintésekből stb." }
         ]},
         { cat: "2.2.0 KÉPERNYŐK", items: [
-            { id: "2.2.1", t: "Áttekintő képek OK?", g: "Szabályzat szerint" },
-            { id: "2.3.1", t: "Pult képek OK?", g: "Szabályzat szerint" },
-            { id: "2.4.1", t: "Állomás képek OK?", g: "Szabályzat szerint" },
-            { id: "2.5.1", t: "Speciális funkciók OK?", g: "Szabályzat szerint" },
-            { id: "2.5.3", t: "Betriebsfunktionen OK?", g: "Szabályzat szerint" },
-            { id: "2.5.4", t: "Robot áttekintők OK?", g: "Szabályzat szerint" },
-            { id: "2.6.0", t: "Részletképek (Zusatz)", g: "Szabályzat szerint" },
-            { id: "2.6.1", t: "Nincs Station/Pult elem?", g: "Nincsenek magasabb szintű elemek" },
-            { id: "2.6.2", t: "Vészleállító (SonderBit)?", g: "DYN_GEN_SonderBit_Endlage_Absolut" },
-            { id: "2.6.3", t: "Részletképek OK?", g: "Stáció részletes képernyő" }
+            { id: "2.2.1", t: "Áttekintő képek OK?", g: "Az áttekintő képek (Übersichtbilder) az Irányelv (Guideline) szerint lettek projektálva?\n\n(Lásd: RB példa / FT példa a dokumentációban)" },
+            { id: "2.3.1", t: "Pult képek OK?", g: "A pultterület képei (Pultbereichsbilder) az Irányelv (Guideline) szerint lettek projektálva?" },
+            { id: "2.4.1", t: "Állomás képek OK?", g: "Az állomás áttekintő képei az Irányelv (Guideline) szerint lettek projektálva?" },
+            { id: "2.5.1", t: "Speciális funkciók OK?", g: "A speciális funkciók (Sonderfunktionen) az Irányelv (Guideline) szerint lettek projektálva?" },
+            { id: "2.5.2", t: "Zusatzfenster OK?", g: "A kiegészítő ablakok (Zusatzfenster) az Irányelv (Guideline) szerint lettek projektálva?\n(Példa: Ragasztás kiegészítő ablak)" },
+            { id: "2.5.3", t: "Betriebsfunktionen OK?", g: "Az üzemi funkciók (Betriebsfunktionen) az Irányelv (Guideline) szerint lettek projektálva?" },
+            { id: "2.5.4", t: "Robot áttekintők OK?", g: "A robot áttekintő képek az Irányelv (Guideline) szerint lettek projektálva?" },
+            { id: "2.6.0", t: "Részletképek (Zusatz)", g: "Állomások részletképei (további képek)" },
+            { id: "2.6.1", t: "Nincs Station/Pult elem?", g: "Nem használtak fölérendelt elemeket, mint például Állomás, Pult stb. (a többszörös hibaüzenetek elkerülése érdekében)?" },
+            { id: "2.6.2", t: "Vészleállító (SonderBit)?", g: "Nem használtak Vészleállító elemet a kiválasztási listából?\n\nEhhez a funkcióhoz a részletképen a „DYN_GEN_SonderBit_Endlage_Absolut” vagy „DYN_GEN_SonderBit_LED_Absolut” sablont kell használni." },
+            { id: "2.6.3", t: "Részletképek OK?", g: "A részletképek az Irányelv (Guideline) szerint lettek projektálva? (Példa: Geostation)" }
         ]}
     ];
 
@@ -311,13 +289,10 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 const base64 = e.target.result;
-                // Megjelenítés
                 const img = document.getElementById(`img-prev-${uid}`);
                 img.src = base64;
                 img.style.display = 'block';
-                // Gomb színezése
                 document.getElementById(`btn-p-${uid}`).classList.add('btn-has-photo');
-                // Adattárolás
                 if(!photoStore[uid]) photoStore[uid] = {};
                 photoStore[uid].img = base64;
             };
@@ -334,7 +309,6 @@
     function setStatus(uid, s) {
         const box = document.getElementById(`box-${uid}`);
         const btns = box.querySelectorAll('.btn-row button');
-        // Reset OK/NOK buttons (indicies: 2=OK, 3=NOK due to inserted Photo btn)
         btns[2].classList.remove('active');
         btns[3].classList.remove('active');
         
@@ -353,10 +327,10 @@
     }
 
     function syncData() {
-        // Csak a placeholder miatt van itt
+        // Placeholder
     }
 
-    // --- MODERN PDF GENERÁLÁS (ÚJ FUNKCIÓ) ---
+    // --- MODERN PDF GENERÁLÁS ---
     function generateModernPDF() {
         const dev = document.getElementById('devName').value || "Nincs megadva";
         const plc = document.getElementById('plcNum').value || "-";
@@ -364,7 +338,6 @@
         const score = document.getElementById('scoreDisplay').innerText;
         const date = new Date().toLocaleDateString('hu-HU');
 
-        // 1. Összegyűjtjük a kitöltött adatokat
         let contentHtml = "";
         const allItems = document.querySelectorAll('.item-box');
 
@@ -375,10 +348,8 @@
             const status = box.getAttribute('data-status');
             const comment = document.getElementById(`com-${uid}`).value;
             
-            // Ha nincs státusz, ne kerüljön a PDF-be (vagy kerüljön "Kitöltetlen"-ként? Itt most kihagyjuk)
             if (!status) return; 
 
-            // Fotó adat
             const photoData = photoStore[uid];
             let photoHtml = "";
             if (photoData && photoData.img) {
@@ -393,7 +364,6 @@
                 `;
             }
 
-            // Blokk felépítése
             contentHtml += `
                 <div class="report-block">
                     <div class="rb-header">
@@ -409,7 +379,6 @@
 
         if(contentHtml === "") contentHtml = "<p style='text-align:center; padding:20px;'>Nincs kiértékelt adat.</p>";
 
-        // 2. A rejtett tároló feltöltése
         const container = document.getElementById('print-container');
         container.innerHTML = `
             <div class="report-header">
@@ -444,15 +413,10 @@
             </div>
         `;
 
-        // 3. Nyomtatás indítása
         window.print();
     }
 
-
-    // --- EXCEL EXPORT (VÁLTOZATLAN) ---
-    // A kommentek és státuszok kezelése ugyanaz maradt, a fotókat az Excelbe 
-    // direkt nem tettük bele, ahogy kérted, hogy a kód ne sérüljön.
-    
+    // --- EXCEL EXPORT ---
     async function translateText(text) {
         if (!text || text.trim() === "") return "";
         try {
@@ -585,4 +549,3 @@
 
 </body>
 </html>
-
