@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INTEGRA CHECKLIST V18</title>
+    <title>INTEGRA CHECKLIST V18 - FULL EXTRA</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 
@@ -53,6 +53,15 @@
             border-left: 2px solid var(--primary); 
             font-size: 0.95rem;
             line-height: 1.5;
+        }
+
+        /* A segédlet képeinek stílusa */
+        .guide-img {
+            max-width: 100%;
+            margin-top: 10px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            display: none; /* Alapból rejtve, amíg be nem tölt */
         }
         
         textarea { width: 100%; background: #111; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 6px; min-height: 60px; box-sizing: border-box; font-family: sans-serif; }
@@ -114,7 +123,7 @@
 
 <div class="card">
     <h1 style="color:var(--primary); margin:0;">INTEGRA CHECKLIST v18</h1>
-    <span class="subtitle" style="color:#888; font-size:0.9rem;">PDF + EXCEL GENERÁTOR</span>
+    <span class="subtitle" style="color:#888; font-size:0.9rem;">FOTÓ (TÖMÖRÍTVE) + SEGÉDLET KÉPEK + EXPORT</span>
     
     <div class="row-group">
         <div class="input-group" style="flex:2;">
@@ -152,7 +161,14 @@
 
 <script>
     // --- KONFIGURÁCIÓ ---
+    // Az eredeti Excel sablon URL-je
     const GITHUB_TEMPLATE_URL = "https://raw.githubusercontent.com/balazsnorberttt-prog/integra-checklist-files/main/DE_PCS_031_02_XXXX_SPSX_Visu%20Checkliste.xlsx";
+    
+    // IDE MÁSOLD MAJD BE A KÉPEK MAPPÁJÁNAK URL-jét (per jellel a végén!)
+    // Példa: "https://raw.githubusercontent.com/felhasznalo/repo/main/images/"
+    // Ha üresen hagyod, nem próbál képeket betölteni a segédlethez.
+    const GITHUB_IMG_BASE_URL = "https://raw.githubusercontent.com/balazsnorberttt-prog/integra-checklist-files/main/K%C3%A9pek/"; 
+
     const TRANSLATE_API = "https://api.mymemory.translated.net/get";
     
     const photoStore = {};
@@ -238,6 +254,14 @@
 
             sect.items.forEach(item => {
                 const uid = item.id.replace(/\./g, '_');
+                
+                // Kép URL generálása (ha van beállítva URL)
+                let guideImageHtml = "";
+                if(GITHUB_IMG_BASE_URL.length > 5) {
+                    const imgUrl = GITHUB_IMG_BASE_URL + item.id + ".png"; // VAGY .jpg
+                    guideImageHtml = `<img src="${imgUrl}" class="guide-img" onload="this.style.display='block'" onerror="this.style.display='none'">`;
+                }
+
                 c.innerHTML += `
                     <div class="item-box" id="box-${uid}" data-id="${item.id}">
                         <span class="id-tag">${item.id}</span>
@@ -250,7 +274,10 @@
                         </div>
                         
                         <div class="details" id="det-${uid}">
-                            <div class="guide-box">${item.g}</div>
+                            <div class="guide-box">
+                                ${item.g}
+                                ${guideImageHtml}
+                            </div>
                             <textarea placeholder="Excel Megjegyzés (Magyar)..." id="com-${uid}"></textarea>
                         </div>
 
@@ -281,8 +308,7 @@
         el.style.display = (el.style.display === 'block') ? 'none' : 'block';
     }
 
-    // --- ÚJ: KÉP TÖMÖRÍTÉS FUNKCIÓ ---
-    // Ez a függvény felel a kép átméretezéséért és tömörítéséért
+    // --- TÖMÖRÍTÉS FUNKCIÓ ---
     function compressImage(file, maxWidth, quality) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -295,7 +321,6 @@
                     let width = img.width;
                     let height = img.height;
 
-                    // Átméretezés (aránytartóan)
                     if (width > maxWidth) {
                         height *= maxWidth / width;
                         width = maxWidth;
@@ -307,7 +332,6 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
                     
-                    // Tömörítés JPEG formátumba (pl. 0.7 = 70% minőség)
                     resolve(canvas.toDataURL('image/jpeg', quality));
                 };
                 img.onerror = error => reject(error);
@@ -320,29 +344,21 @@
     async function savePhoto(event, uid) {
         const file = event.target.files[0];
         if (file) {
-            // Gomb átváltása "Töltés..." állapotra (opcionális, de jó visszajelzés)
             const btn = document.querySelector(`#pho-${uid} .btn-action`);
             const originalText = btn.innerText;
             btn.innerText = "⏳ Tömörítés...";
 
             try {
-                // TÖMÖRÍTÉS HÍVÁSA: Max 1200px szélesség, 70%-os minőség
                 const compressedBase64 = await compressImage(file, 1200, 0.7);
-                
-                // Megjelenítés
                 const img = document.getElementById(`img-prev-${uid}`);
                 img.src = compressedBase64;
                 img.style.display = 'block';
-                
-                // Gomb színezése
                 document.getElementById(`btn-p-${uid}`).classList.add('btn-has-photo');
-                
-                // Adattárolás
                 if(!photoStore[uid]) photoStore[uid] = {};
                 photoStore[uid].img = compressedBase64;
 
             } catch (err) {
-                console.error("Hiba a tömörítésnél:", err);
+                console.error("Hiba:", err);
                 alert("Hiba a kép feldolgozásakor!");
             } finally {
                 btn.innerText = originalText;
@@ -361,9 +377,7 @@
         const btns = box.querySelectorAll('.btn-row button');
         btns[2].classList.remove('active');
         btns[3].classList.remove('active');
-        
         box.setAttribute('data-status', s);
-
         if(s === 'OK') { btns[2].classList.add('active'); } 
         else { btns[3].classList.add('active'); document.getElementById(`det-${uid}`).style.display = 'block'; }
         calc();
@@ -380,7 +394,7 @@
         // Placeholder
     }
 
-    // --- MODERN PDF GENERÁLÁS ---
+    // --- PDF GENERÁLÁS ---
     function generateModernPDF() {
         const dev = document.getElementById('devName').value || "Nincs megadva";
         const plc = document.getElementById('plcNum').value || "-";
@@ -397,7 +411,6 @@
             const text = box.querySelector('.q-text').innerText;
             const status = box.getAttribute('data-status');
             const comment = document.getElementById(`com-${uid}`).value;
-            
             if (!status) return; 
 
             const photoData = photoStore[uid];
@@ -486,11 +499,7 @@
     async function startAutoExport() {
         const devName = document.getElementById('devName').value;
         const plcNum = document.getElementById('plcNum').value;
-        
-        if(!devName || !plcNum) { 
-            alert("Kérlek töltsd ki a Berendezés nevét (XXXX) és a PLC számát!"); 
-            return; 
-        }
+        if(!devName || !plcNum) { alert("Kérlek töltsd ki a Berendezés nevét (XXXX) és a PLC számát!"); return; }
 
         const btn = document.getElementById('btnExport');
         const status = document.getElementById('statusText');
@@ -599,4 +608,3 @@
 
 </body>
 </html>
-
