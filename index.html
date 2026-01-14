@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INTEGRA CHECKLIST V22 - FINAL EXPORT</title>
+    <title>INTEGRA CHECKLIST V23 - STABLE EXPORT</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 
@@ -126,8 +126,8 @@
 <body>
 
 <div class="card">
-    <h1 style="color:var(--primary); margin:0;">INTEGRA CHECKLIST v22</h1>
-    <span class="subtitle" style="color:#888; font-size:0.9rem;">EGYESÍTETT MEZŐK + PDF NÉV + EXCEL JAVÍTÁS</span>
+    <h1 style="color:var(--primary); margin:0;">INTEGRA CHECKLIST v23</h1>
+    <span class="subtitle" style="color:#888; font-size:0.9rem;">STABLE EXPORT | PDF NAME FIX</span>
     
     <div class="row-group">
         <div class="input-group" style="flex:2;">
@@ -461,7 +461,7 @@
                 <h1 class="report-title">INTEGRA JEGYZŐKÖNYV</h1>
                 <div class="report-meta">
                     Dátum: ${date}<br>
-                    Generálva: Integra Check v22
+                    Generálva: Integra Check v23
                 </div>
             </div>
 
@@ -610,14 +610,14 @@
             anchor.download = finalFileName; 
             document.body.appendChild(anchor);
             
-            alert(`A fájl letöltése elindul: ${finalFileName}\n\nHa nem kéri a helyet, nézd meg a 'Letöltések' mappát!`);
-            
+            // AZONNAL KATTINTUNK, HOGY A MOBIL BÖNGÉSZŐ NE TILTSA LE!
             anchor.click();
             
+            // A takarítást későbbre halasztjuk
             setTimeout(() => {
                 document.body.removeChild(anchor);
                 window.URL.revokeObjectURL(url);
-            }, 100);
+            }, 60000); // 1 percet adunk a letöltés befejezésére
             
             status.innerText = "Kész!";
 
