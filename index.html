@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INTEGRA CHECKLIST V18 - HU</title>
+    <title>INTEGRA CHECKLIST V18</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 
@@ -43,14 +43,13 @@
         
         .details { display: none; margin-top: 15px; border-top: 1px dashed #444; padding-top: 15px; }
         
-        /* Frissített Guide Box: sortörések kezelése */
         .guide-box { 
             background: rgba(0,188,212,0.1); 
             color: #e0e0e0; 
             padding: 12px; 
             border-radius: 6px; 
             margin-bottom: 15px; 
-            white-space: pre-wrap; /* Sortörések megtartása */
+            white-space: pre-wrap;
             border-left: 2px solid var(--primary); 
             font-size: 0.95rem;
             line-height: 1.5;
@@ -158,7 +157,7 @@
     
     const photoStore = {};
 
-    // --- ADATBÁZIS (FRISSÍTETT MAGYAR RÉSZLETES LEÍRÁSOKKAL) ---
+    // --- ADATBÁZIS ---
     const data = [
         { cat: "1.1.0 HÁLÓZAT", items: [
             { id: "1.1.1", t: "Hálózati telepítés előírás szerinti?", g: "Megfelelő-e a hálózati telepítés az előírásoknak?\n\n- Windows PC-k, amelyek I/O modulokkal egy házban találhatók, utolsó résztvevőként csatlakozhatnak (EBF, HVO, …).\n- További kezelő számítógépeket (EBF, TBR) közvetlenül egy olyan Switch-re kell csatlakoztatni, amely az Automation Access Switch portbővítésére szolgál (pl. XC200 switch a +H111 állomásszekrényben), vagy közvetlenül az Automation-Access-Switch-re." },
@@ -282,21 +281,72 @@
         el.style.display = (el.style.display === 'block') ? 'none' : 'block';
     }
 
-    // Fotó betöltése és tárolása Base64 formátumban
-    function savePhoto(event, uid) {
+    // --- ÚJ: KÉP TÖMÖRÍTÉS FUNKCIÓ ---
+    // Ez a függvény felel a kép átméretezéséért és tömörítéséért
+    function compressImage(file, maxWidth, quality) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = event => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+
+                    // Átméretezés (aránytartóan)
+                    if (width > maxWidth) {
+                        height *= maxWidth / width;
+                        width = maxWidth;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Tömörítés JPEG formátumba (pl. 0.7 = 70% minőség)
+                    resolve(canvas.toDataURL('image/jpeg', quality));
+                };
+                img.onerror = error => reject(error);
+            };
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    // --- MÓDOSÍTOTT FOTÓ MENTÉS ---
+    async function savePhoto(event, uid) {
         const file = event.target.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const base64 = e.target.result;
+            // Gomb átváltása "Töltés..." állapotra (opcionális, de jó visszajelzés)
+            const btn = document.querySelector(`#pho-${uid} .btn-action`);
+            const originalText = btn.innerText;
+            btn.innerText = "⏳ Tömörítés...";
+
+            try {
+                // TÖMÖRÍTÉS HÍVÁSA: Max 1200px szélesség, 70%-os minőség
+                const compressedBase64 = await compressImage(file, 1200, 0.7);
+                
+                // Megjelenítés
                 const img = document.getElementById(`img-prev-${uid}`);
-                img.src = base64;
+                img.src = compressedBase64;
                 img.style.display = 'block';
+                
+                // Gomb színezése
                 document.getElementById(`btn-p-${uid}`).classList.add('btn-has-photo');
+                
+                // Adattárolás
                 if(!photoStore[uid]) photoStore[uid] = {};
-                photoStore[uid].img = base64;
-            };
-            reader.readAsDataURL(file);
+                photoStore[uid].img = compressedBase64;
+
+            } catch (err) {
+                console.error("Hiba a tömörítésnél:", err);
+                alert("Hiba a kép feldolgozásakor!");
+            } finally {
+                btn.innerText = originalText;
+            }
         }
     }
 
