@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INTEGRA CHECKLIST V18 - FULL EXTRA</title>
+    <title>INTEGRA CHECKLIST V19 - FINAL</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 
@@ -43,25 +43,29 @@
         
         .details { display: none; margin-top: 15px; border-top: 1px dashed #444; padding-top: 15px; }
         
+        /* --- ÚJ GUIDE BOX STÍLUS (TAGOLT) --- */
         .guide-box { 
-            background: rgba(0,188,212,0.1); 
+            background: rgba(0,188,212,0.08); 
             color: #e0e0e0; 
-            padding: 12px; 
+            padding: 15px; 
             border-radius: 6px; 
             margin-bottom: 15px; 
-            white-space: pre-wrap;
-            border-left: 2px solid var(--primary); 
+            border-left: 3px solid var(--primary); 
             font-size: 0.95rem;
-            line-height: 1.5;
+            line-height: 1.6;
         }
+        /* HTML Listák formázása a guide-boxon belül */
+        .guide-box ul { padding-left: 20px; margin: 5px 0 10px 0; }
+        .guide-box li { margin-bottom: 5px; }
+        .guide-box strong { color: var(--primary); font-weight: 700; }
 
-        /* A segédlet képeinek stílusa */
         .guide-img {
             max-width: 100%;
-            margin-top: 10px;
-            border-radius: 4px;
+            margin-top: 15px;
+            border-radius: 6px;
             border: 1px solid #444;
-            display: none; /* Alapból rejtve, amíg be nem tölt */
+            display: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
         
         textarea { width: 100%; background: #111; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 6px; min-height: 60px; box-sizing: border-box; font-family: sans-serif; }
@@ -122,8 +126,8 @@
 <body>
 
 <div class="card">
-    <h1 style="color:var(--primary); margin:0;">INTEGRA CHECKLIST v18</h1>
-    <span class="subtitle" style="color:#888; font-size:0.9rem;">FOTÓ (TÖMÖRÍTVE) + SEGÉDLET KÉPEK + EXPORT</span>
+    <h1 style="color:var(--primary); margin:0;">INTEGRA CHECKLIST v19</h1>
+    <span class="subtitle" style="color:#888; font-size:0.9rem;">PROFESSIONAL EDITION</span>
     
     <div class="row-group">
         <div class="input-group" style="flex:2;">
@@ -161,79 +165,110 @@
 
 <script>
     // --- KONFIGURÁCIÓ ---
-    // Az eredeti Excel sablon URL-je
     const GITHUB_TEMPLATE_URL = "https://raw.githubusercontent.com/balazsnorberttt-prog/integra-checklist-files/main/DE_PCS_031_02_XXXX_SPSX_Visu%20Checkliste.xlsx";
     
-    // IDE MÁSOLD MAJD BE A KÉPEK MAPPÁJÁNAK URL-jét (per jellel a végén!)
-    // Példa: "https://raw.githubusercontent.com/felhasznalo/repo/main/images/"
-    // Ha üresen hagyod, nem próbál képeket betölteni a segédlethez.
-    const GITHUB_IMG_BASE_URL = "https://raw.githubusercontent.com/balazsnorberttt-prog/integra-checklist-files/main/K%C3%A9pek/"; 
+    // IDE MÁSOLD BE A KÉPEK ÚJ ÚTVONALÁT (images mappa, ékezet nélkül!)
+    const GITHUB_IMG_BASE_URL = "https://raw.githubusercontent.com/balazsnorberttt-prog/integra-checklist-files/main/images/"; 
 
     const TRANSLATE_API = "https://api.mymemory.translated.net/get";
-    
     const photoStore = {};
 
-    // --- ADATBÁZIS ---
+    // --- ADATBÁZIS (HTML FORMÁZOTT LEÍRÁSOKKAL) ---
+    // A 'g' mezőben mostantól HTML kódokat használunk a szebb megjelenésért!
+    // <ul> = Lista indítása, <li> = Lista elem, <strong> = Félkövér
+    
     const data = [
         { cat: "1.1.0 HÁLÓZAT", items: [
-            { id: "1.1.1", t: "Hálózati telepítés előírás szerinti?", g: "Megfelelő-e a hálózati telepítés az előírásoknak?\n\n- Windows PC-k, amelyek I/O modulokkal egy házban találhatók, utolsó résztvevőként csatlakozhatnak (EBF, HVO, …).\n- További kezelő számítógépeket (EBF, TBR) közvetlenül egy olyan Switch-re kell csatlakoztatni, amely az Automation Access Switch portbővítésére szolgál (pl. XC200 switch a +H111 állomásszekrényben), vagy közvetlenül az Automation-Access-Switch-re." },
-            { id: "1.1.2", t: "Gépnév egyedi és egyeztetve?", g: "Egyértelmű a számítógép neve és egyeztetve lett?\n\n- Windows PC-k I/O modulokkal azonos házban utolsó résztvevőként csatlakozhatnak." },
-            { id: "1.1.3", t: "Ondeso tool futott?", g: "Az 'Ondeso' eszköz megfelelően lett futtatva?\n\n- Hálózat és számítógépnév, illetve tartomány (Domain) illesztése.\n- Illesztés a szerverrendszerekhez." }
+            { 
+                id: "1.1.1", 
+                t: "Hálózati telepítés előírás szerinti?", 
+                g: "<strong>Megfelelő a hálózati telepítés az előírásoknak?</strong><br><br><ul><li>A Windows PC-k (melyek I/O modulokkal egy házban vannak) <strong>utolsó résztvevőként</strong> csatlakozhatnak (EBF, HVO...).</li><li>További kezelő számítógépeket (EBF, TBR) közvetlenül egy <strong>Switch-re</strong> kell csatlakoztatni (ami az Automation Access Switch portbővítése, pl. XC200 a +H111-ben), vagy közvetlenül az Automation-Access-Switch-re.</li></ul>" 
+            },
+            { 
+                id: "1.1.2", 
+                t: "Gépnév egyedi és egyeztetve?", 
+                g: "<strong>Rechnername (Számítógépnév) ellenőrzése:</strong><br><br><ul><li>A számítógép neve egyértelmű és egyeztetve lett?</li><li>A Windows PC-k I/O modulokkal azonos házban utolsó résztvevőként vannak csatlakoztatva?</li></ul>" 
+            },
+            { 
+                id: "1.1.3", 
+                t: "Ondeso tool futott?", 
+                g: "<strong>Ondeso eszköz futtatása:</strong><br><br><ul><li>Az 'Ondeso' eszköz megfelelően lefutott?</li><li>Megtörtént a hálózat és a számítógépnév/tartomány (Domain) illesztése?</li><li>Szerverrendszerekhez való illesztés rendben van?</li></ul>" 
+            }
         ]},
         { cat: "1.2.0 SZOFTVER", items: [
-            { id: "1.2.1", t: "Image Verzió aktuális?", g: "Melyik Image Verzió (IT Image PN) van telepítve, és ez aktuális-e?\n\nEllenőrzés helye: D:\\Tools\\OS-Info" },
-            { id: "1.2.2", t: "TIA Portal verzió megfelelő?", g: "A SIMATIC STEP7 Professional (TIA-Portal) verziója megfelel az előírásnak?\n\nLásd: 000_B3.26.03_Projektierversion-Profinet-Komponenten_V60.xx.xls" },
-            { id: "1.2.3", t: "Safety verzió megfelelő?", g: "A SIMATIC STEP7 Safety (TIA-Portal) verziója megfelel az előírásnak?\n\nLásd: 000_B3.26.03_Projektierversion-Profinet-Komponenten_V60.xx.xls" },
-            { id: "1.2.4", t: "Integra Designer verzió?", g: "Melyik Integra Designer verzió van telepítve, és megfelel-e az előírásnak?" }
+            { 
+                id: "1.2.1", 
+                t: "Image Verzió aktuális?", 
+                g: "<strong>Image verzió ellenőrzése:</strong><br><br><ul><li>Melyik Image Verzió (IT Image PN) van telepítve?</li><li>Ez a verzió aktuális?</li></ul><br><em>Ellenőrzés helye: D:\\Tools\\OS-Info</em>" 
+            },
+            { 
+                id: "1.2.2", 
+                t: "TIA Portal verzió megfelelő?", 
+                g: "<strong>SIMATIC STEP7 Professional (TIA-Portal)</strong><br><br><ul><li>A verzió megfelel az aktuális előírásnak?</li></ul><br><em>Lásd: 000_B3.26.03_Projektierversion-Profinet-Komponenten_V60.xx.xls</em>" 
+            },
+            { 
+                id: "1.2.3", 
+                t: "Safety verzió megfelelő?", 
+                g: "<strong>SIMATIC STEP7 Safety (TIA-Portal)</strong><br><br><ul><li>A Safety verzió megfelel az előírásnak?</li></ul><br><em>Lásd: 000_B3.26.03_Projektierversion-Profinet-Komponenten_V60.xx.xls</em>" 
+            },
+            { 
+                id: "1.2.4", 
+                t: "Integra Designer verzió?", 
+                g: "<strong>Integra Designer</strong><br><br><ul><li>Melyik verzió van telepítve?</li><li>Megfelel ez a verzió az előírásoknak?</li></ul>" 
+            }
         ]},
         { cat: "1.3.0 HARDWARE", items: [
-             { id: "1.3.1", t: "PC feliratozva?", g: "Fel van iratozva a PC névvel?\nMegfelel a vizualizáció felépítése és telepítése az aktuális előírásoknak?" }
+             { 
+                 id: "1.3.1", 
+                 t: "PC feliratozva?", 
+                 g: "<strong>Hardver és Jelölés:</strong><br><br><ul><li>Fel van iratozva a PC a nevével?</li><li>Megfelel a vizualizáció felépítése és telepítése az aktuális előírásoknak?</li></ul>" 
+             }
         ]},
         { cat: "1.4.0 RENDSZER", items: [
-            { id: "1.4.1", t: "Rendszerdiagnosztika hiba nélkül?", g: "Nincsenek hibák a rendszeráttekintő berendezés-diagnosztikában (Systemübersicht Anlagendiagnose)?" },
-            { id: "1.4.2", t: "IntegraCheck OK?", g: "Rendszeráttekintő berendezés-diagnosztika:\nRendben van az IntegraCheck?" },
-            { id: "1.4.3", t: "Mozgásképek rendben?", g: "Megvannak a mozgásképek (Bewegungsbilder) és megfelelnek az előírásnak?" },
-            { id: "1.4.4", t: "Interfész képek rendben?", g: "Megvannak az interfész képek (Schnittstellenbilder) és megfelelnek az előírásnak?" },
-            { id: "1.4.5", t: "Designer Templates OK?", g: "Nem lettek módosítva az aktuális Designer sablonok (Templates), Designer modulok és a SystemTemplates.zip fájl?" },
-            { id: "1.4.6", t: "Scriptek dokumentálva?", g: "Használtak szkripteket a Designer projektben, és ezek dokumentálva vannak?" },
-            { id: "1.4.7", t: "Nyelv beállítva?", g: "A vizualizáció nyelvi beállításai a tervezés megkezdése előtt módosítva lettek?" }
+            { id: "1.4.1", t: "Rendszerdiagnosztika hiba nélkül?", g: "<strong>Rendszeráttekintő Diagnosztika:</strong><br><br><ul><li>Vannak hibák a rendszeráttekintő berendezés-diagnosztikában?</li><li>(Systemübersicht Anlagendiagnose)</li></ul>" },
+            { id: "1.4.2", t: "IntegraCheck OK?", g: "<strong>IntegraCheck Futtatása:</strong><br><br><ul><li>Rendszeráttekintő berendezés-diagnosztika menüben:</li><li>Rendben van az IntegraCheck állapota?</li></ul>" },
+            { id: "1.4.3", t: "Mozgásképek rendben?", g: "<strong>Mozgásképek (Bewegungsbilder):</strong><br><br><ul><li>Megvannak a mozgásképek?</li><li>Megfelelnek az előírásoknak?</li></ul>" },
+            { id: "1.4.4", t: "Interfész képek rendben?", g: "<strong>Interfész képek (Schnittstellenbilder):</strong><br><br><ul><li>Megvannak az interfész képek?</li><li>Megfelelnek az előírásoknak?</li></ul>" },
+            { id: "1.4.5", t: "Designer Templates OK?", g: "<strong>Sablonok Ellenőrzése:</strong><br><br><ul><li>A következő fájlok <strong>NEM</strong> lettek módosítva:</li><li>Designer Templates</li><li>Designer Module</li><li>SystemTemplates.zip</li></ul>" },
+            { id: "1.4.6", t: "Scriptek dokumentálva?", g: "<strong>Scriptek használata:</strong><br><br><ul><li>Használtak szkripteket a Designer projektben?</li><li>Ha igen, ezek megfelelően dokumentálva vannak?</li></ul>" },
+            { id: "1.4.7", t: "Nyelv beállítva?", g: "<strong>Nyelvi beállítások:</strong><br><br><ul><li>A vizualizáció nyelvi beállításai a tervezés megkezdése előtt módosítva lettek?</li></ul>" }
         ]},
         { cat: "1.5.0 VISU - PROJEKTIERUNG", items: [
-             { id: "1.5.1", t: "Lásd Visu - Detail", g: "Lásd a részletes vizualizációs ellenőrzőlistát (Visu - Detail)." }
+             { id: "1.5.1", t: "Lásd Visu - Detail", g: "Kérlek lapozz a <strong>Visu - Detail</strong> szekcióhoz a részletes ellenőrzéshez." }
         ]},
         { cat: "1.6.0 KIEGÉSZÍTÉSEK", items: [
-            { id: "1.6.1", t: "Mintaprojektek betartva?", g: "Figyelembe vették a mintaprojektek (RB, MO, FT) előírásait és a rendelkezésre bocsátott sablonokat a megbeszélések szerint?" },
-            { id: "1.6.2", t: "Tech paraméterek jó helyen?", g: "Minden technológiai paraméter / program az előírt könyvtárakban van tárolva?\n(Pl. D:\\CMWProjects mappa)" },
-            { id: "1.6.3", t: "IntegraShell konfiguráció?", g: "Helyesen indul el az IntegraShell, és minden megfelelően van konfigurálva?" },
-            { id: "1.6.4", t: "EKM kapcsolat?", g: "Helyesen van konfigurálva a hozzáférés-védelem?\n(Kapcsolat az EKM szerverhez)" },
-            { id: "1.6.5", t: "isiSave beállítva?", g: "Helyesen van konfigurálva az archiváló szerver, és a felhasználói adatok mentésre kerültek?\n(Kapcsolat ISI-Save, ISI-Save CMW)" },
-            { id: "1.6.6", t: "Index-Szerver OK?", g: "Helyesen van beállítva az Index-Szerver?" },
-            { id: "1.6.7", t: "DFI-Szerver OK?", g: "Helyesen van beállítva a DFI-Szerver?" },
-            { id: "1.6.8", t: "SIS Log tiszta?", g: "Vannak hibaüzenetek a SIS-Szerver naplófájljaiban (Log-fájlok)?\n(D:\\integra\\System\\Logs\\SisServer.csv)" },
-            { id: "1.6.9", t: "Mappastruktúra OK?", g: "A könyvtárszerkezet az előírásoknak megfelelően lett létrehozva, és a projektek ennek megfelelően vannak tárolva?\nPl: D:\\CMWProjects\\MO\\LFA1\\LFA1SPS1.IDPRO" },
-            { id: "1.6.10", t: "Szemét törölve?", g: "Töröltek minden régi fájlt a projekt mappából?\n(Csak <Berendezés>.S7TIA fájl lehet SPS-enként)" },
-            { id: "1.6.11", t: "Vírusirtó frissül?", g: "Automatikusan frissül a vírusirtó program?" }
+            { id: "1.6.1", t: "Mintaprojektek betartva?", g: "<strong>Mintaprojektek és Előírások:</strong><br><br><ul><li>Figyelembe vették a mintaprojektek (RB, MO, FT) előírásait?</li><li>A rendelkezésre bocsátott sablonokat a megbeszélések szerint használták?</li></ul>" },
+            { id: "1.6.2", t: "Tech paraméterek jó helyen?", g: "<strong>Fájlok tárolása:</strong><br><br><ul><li>Minden technológiai paraméter / program az előírt könyvtárakban van tárolva?</li></ul><br><em>Példa: D:\\CMWProjects mappa</em>" },
+            { id: "1.6.3", t: "IntegraShell konfiguráció?", g: "<strong>IntegraShell:</strong><br><br><ul><li>Helyesen indul el az IntegraShell?</li><li>Minden konfiguráció megfelelő?</li></ul>" },
+            { id: "1.6.4", t: "EKM kapcsolat?", g: "<strong>Hozzáférések:</strong><br><br><ul><li>Helyesen van konfigurálva a hozzáférés-védelem?</li><li>Van kapcsolat az EKM szerverhez?</li></ul>" },
+            { id: "1.6.5", t: "isiSave beállítva?", g: "<strong>Archiválás (isiSave):</strong><br><br><ul><li>Helyesen van konfigurálva az archiváló szerver?</li><li>A felhasználói adatok mentésre kerülnek?</li><li>Kapcsolat: ISI-Save, ISI-Save CMW</li></ul>" },
+            { id: "1.6.6", t: "Index-Szerver OK?", g: "<strong>Index-Szerver:</strong><br><br><ul><li>Helyesen van beállítva az Index-Szerver?</li></ul>" },
+            { id: "1.6.7", t: "DFI-Szerver OK?", g: "<strong>DFI-Szerver:</strong><br><br><ul><li>Helyesen van beállítva a DFI-Szerver?</li></ul>" },
+            { id: "1.6.8", t: "SIS Log tiszta?", g: "<strong>SIS-Szerver Logok:</strong><br><br><ul><li>Vannak hibaüzenetek a SIS-Szerver naplófájljaiban?</li></ul><br><em>Útvonal: D:\\integra\\System\\Logs\\SisServer.csv</em>" },
+            { id: "1.6.9", t: "Mappastruktúra OK?", g: "<strong>Könyvtárszerkezet:</strong><br><br><ul><li>A struktúra az előírásoknak megfelelően lett létrehozva?</li><li>A projektek ennek megfelelően vannak tárolva?</li></ul><br><em>Pl: D:\\CMWProjects\\MO\\LFA1\\LFA1SPS1.IDPRO</em>" },
+            { id: "1.6.10", t: "Szemét törölve?", g: "<strong>Takarítás:</strong><br><br><ul><li>Töröltek minden régi fájlt a projekt mappából?</li><li>Csak a <strong>&lt;Berendezés&gt;.S7TIA</strong> fájl lehet SPS-enként!</li></ul>" },
+            { id: "1.6.11", t: "Vírusirtó frissül?", g: "<strong>Vírusvédelem:</strong><br><br><ul><li>Automatikusan frissül a vírusirtó program?</li></ul>" }
         ]},
         { cat: "2.1.0 PLC (SPS)", items: [
-            { id: "2.1.1", t: "Minden PLC terület látszik?", g: "Minden SPS terület projektálva van a berendezés-kiválasztásban?" },
-            { id: "2.1.2", t: "Minden területnek van vizuja?", g: "Léteznek projektált vizualizációs képek minden SPS területhez?" },
-            { id: "2.1.3", t: "Full HD felbontás?", g: "Az Integra Projekt Varázslóban (Wizard) a Full HD felbontást választották ki?" },
-            { id: "2.1.4", t: "Calibri 10 Bold?", g: "Minden elemnél a szabványos betűtípust (Calibri, Félkövér, 10-es méret, „Alignment taLeftJustify”) használták?" },
-            { id: "2.1.5", t: "Pult 99 (Nyers) ablak?", g: "A fölérendelt Pult 99 (Karosszéria/Rohbau) esetében az áttekintő képet a helyettesítő ablak funkcióval jelenítették meg?" },
-            { id: "2.1.6", t: "PNG átlátszó képek?", g: "A képek megjelenítése PNG formátumban, átlátszó háttérrel, max. kb. 100KB fájlmérettel történt?\n\nElőnyben kell részesíteni a CAD rajzokat, pl.: funkcionális elrendezési tervekből, szerszám áttekintésekből stb." }
+            { id: "2.1.1", t: "Minden PLC terület látszik?", g: "<strong>Berendezés kiválasztás:</strong><br><br><ul><li>Minden SPS terület projektálva van a berendezés-kiválasztásban?</li></ul>" },
+            { id: "2.1.2", t: "Minden területnek van vizuja?", g: "<strong>Vizualizáció megléte:</strong><br><br><ul><li>Léteznek projektált vizualizációs képek minden SPS területhez?</li></ul>" },
+            { id: "2.1.3", t: "Full HD felbontás?", g: "<strong>Felbontás:</strong><br><br><ul><li>Az Integra Projekt Varázslóban (Wizard) a <strong>Full HD</strong> felbontást választották ki?</li></ul>" },
+            { id: "2.1.4", t: "Calibri 10 Bold?", g: "<strong>Betűtípus és Stílus:</strong><br><br><ul><li>Minden elemnél a szabványos beállítást használták?</li><li>Font: <strong>Calibri</strong></li><li>Stílus: <strong>Félkövér (Bold)</strong></li><li>Méret: <strong>10</strong></li><li>Igazítás: <strong>Alignment taLeftJustify</strong></li></ul>" },
+            { id: "2.1.5", t: "Pult 99 (Nyers) ablak?", g: "<strong>Pult 99 (Karosszéria/Rohbau):</strong><br><br><ul><li>Az áttekintő képet a <strong>helyettesítő ablak</strong> funkcióval jelenítették meg?</li></ul>" },
+            { id: "2.1.6", t: "PNG átlátszó képek?", g: "<strong>Képek formátuma:</strong><br><br><ul><li>Formátum: <strong>PNG</strong></li><li>Háttér: <strong>Átlátszó</strong></li><li>Méret: <strong>Max. kb. 100KB</strong></li></ul><br><em>Tipp: Előnyben kell részesíteni a CAD rajzokat (pl. funkcionális elrendezési tervek).</em>" }
         ]},
         { cat: "2.2.0 KÉPERNYŐK", items: [
-            { id: "2.2.1", t: "Áttekintő képek OK?", g: "Az áttekintő képek (Übersichtbilder) az Irányelv (Guideline) szerint lettek projektálva?\n\n(Lásd: RB példa / FT példa a dokumentációban)" },
-            { id: "2.3.1", t: "Pult képek OK?", g: "A pultterület képei (Pultbereichsbilder) az Irányelv (Guideline) szerint lettek projektálva?" },
-            { id: "2.4.1", t: "Állomás képek OK?", g: "Az állomás áttekintő képei az Irányelv (Guideline) szerint lettek projektálva?" },
-            { id: "2.5.1", t: "Speciális funkciók OK?", g: "A speciális funkciók (Sonderfunktionen) az Irányelv (Guideline) szerint lettek projektálva?" },
-            { id: "2.5.2", t: "Zusatzfenster OK?", g: "A kiegészítő ablakok (Zusatzfenster) az Irányelv (Guideline) szerint lettek projektálva?\n(Példa: Ragasztás kiegészítő ablak)" },
-            { id: "2.5.3", t: "Betriebsfunktionen OK?", g: "Az üzemi funkciók (Betriebsfunktionen) az Irányelv (Guideline) szerint lettek projektálva?" },
-            { id: "2.5.4", t: "Robot áttekintők OK?", g: "A robot áttekintő képek az Irányelv (Guideline) szerint lettek projektálva?" },
-            { id: "2.6.0", t: "Részletképek (Zusatz)", g: "Állomások részletképei (további képek)" },
-            { id: "2.6.1", t: "Nincs Station/Pult elem?", g: "Nem használtak fölérendelt elemeket, mint például Állomás, Pult stb. (a többszörös hibaüzenetek elkerülése érdekében)?" },
-            { id: "2.6.2", t: "Vészleállító (SonderBit)?", g: "Nem használtak Vészleállító elemet a kiválasztási listából?\n\nEhhez a funkcióhoz a részletképen a „DYN_GEN_SonderBit_Endlage_Absolut” vagy „DYN_GEN_SonderBit_LED_Absolut” sablont kell használni." },
-            { id: "2.6.3", t: "Részletképek OK?", g: "A részletképek az Irányelv (Guideline) szerint lettek projektálva? (Példa: Geostation)" }
+            { id: "2.2.1", t: "Áttekintő képek OK?", g: "<strong>Áttekintő képek (Übersichtbilder):</strong><br><br><ul><li>Az Irányelv (Guideline) szerint lettek projektálva?</li><li>Lásd a példákat a dokumentációban (RB / FT).</li></ul>" },
+            { id: "2.3.1", t: "Pult képek OK?", g: "<strong>Pultterület képei (Pultbereichsbilder):</strong><br><br><ul><li>Az Irányelv (Guideline) szerint lettek projektálva?</li></ul>" },
+            { id: "2.4.1", t: "Állomás képek OK?", g: "<strong>Állomás áttekintő képek:</strong><br><br><ul><li>Az Irányelv (Guideline) szerint lettek projektálva?</li></ul>" },
+            { id: "2.5.1", t: "Speciális funkciók OK?", g: "<strong>Speciális funkciók (Sonderfunktionen):</strong><br><br><ul><li>Az Irányelv (Guideline) szerint lettek projektálva?</li></ul>" },
+            { id: "2.5.2", t: "Zusatzfenster OK?", g: "<strong>Kiegészítő ablakok (Zusatzfenster):</strong><br><br><ul><li>Az Irányelv (Guideline) szerint lettek projektálva?</li></ul><br><em>Példa: Ragasztás kiegészítő ablak</em>" },
+            { id: "2.5.3", t: "Betriebsfunktionen OK?", g: "<strong>Üzemi funkciók (Betriebsfunktionen):</strong><br><br><ul><li>Az Irányelv (Guideline) szerint lettek projektálva?</li></ul>" },
+            { id: "2.5.4", t: "Robot áttekintők OK?", g: "<strong>Robot áttekintő képek:</strong><br><br><ul><li>Az Irányelv (Guideline) szerint lettek projektálva?</li></ul>" },
+            { id: "2.6.0", t: "Részletképek (Zusatz)", g: "<strong>Állomások részletképei:</strong><br><br>Ellenőrzési pontok a további képekhez." },
+            { id: "2.6.1", t: "Nincs Station/Pult elem?", g: "<strong>Hierarchia ellenőrzés:</strong><br><br><ul><li><strong>NEM</strong> használtak fölérendelt elemeket (mint pl. Állomás, Pult)?</li><li>Ez fontos a többszörös hibaüzenetek elkerülése érdekében.</li></ul>" },
+            { id: "2.6.2", t: "Vészleállító (SonderBit)?", g: "<strong>Vészleállító (Not-Halt):</strong><br><br><ul><li><strong>TILOS</strong> a kiválasztási listából Vészleállító elemet használni!</li><li>Helyette a részletképen az alábbi sablonokat kell használni:</li><li><code>DYN_GEN_SonderBit_Endlage_Absolut</code> VAGY</li><li><code>DYN_GEN_SonderBit_LED_Absolut</code></li></ul>" },
+            { id: "2.6.3", t: "Részletképek OK?", g: "<strong>Részletképek megfelelősége:</strong><br><br><ul><li>Az Irányelv (Guideline) szerint lettek projektálva?</li></ul><br><em>Példa: Geostation</em>" }
         ]}
     ];
 
@@ -255,10 +290,10 @@
             sect.items.forEach(item => {
                 const uid = item.id.replace(/\./g, '_');
                 
-                // Kép URL generálása (ha van beállítva URL)
+                // Kép URL generálása (JPG kiterjesztés!)
                 let guideImageHtml = "";
                 if(GITHUB_IMG_BASE_URL.length > 5) {
-                    const imgUrl = GITHUB_IMG_BASE_URL + item.id + ".jpg"; // VAGY .jpg
+                    const imgUrl = GITHUB_IMG_BASE_URL + item.id + ".jpg"; 
                     guideImageHtml = `<img src="${imgUrl}" class="guide-img" onload="this.style.display='block'" onerror="this.style.display='none'">`;
                 }
 
@@ -448,7 +483,7 @@
                 <h1 class="report-title">INTEGRA JEGYZŐKÖNYV</h1>
                 <div class="report-meta">
                     Dátum: ${date}<br>
-                    Generálva: Integra Check v18
+                    Generálva: Integra Check v19
                 </div>
             </div>
 
@@ -608,4 +643,3 @@
 
 </body>
 </html>
-
