@@ -258,7 +258,7 @@
                 // Kép URL generálása (ha van beállítva URL)
                 let guideImageHtml = "";
                 if(GITHUB_IMG_BASE_URL.length > 5) {
-                    const imgUrl = GITHUB_IMG_BASE_URL + item.id + ".png"; // VAGY .jpg
+                    const imgUrl = GITHUB_IMG_BASE_URL + item.id + ".jpg"; // VAGY .jpg
                     guideImageHtml = `<img src="${imgUrl}" class="guide-img" onload="this.style.display='block'" onerror="this.style.display='none'">`;
                 }
 
@@ -608,3 +608,4 @@
 
 </body>
 </html>
+
