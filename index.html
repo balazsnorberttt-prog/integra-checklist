@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INTEGRA CHECKLIST V19 - FINAL</title>
+    <title>INTEGRA CHECKLIST V20</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 
@@ -58,6 +58,7 @@
         .guide-box ul { padding-left: 20px; margin: 5px 0 10px 0; }
         .guide-box li { margin-bottom: 5px; }
         .guide-box strong { color: var(--primary); font-weight: 700; }
+        .guide-box code { background: #333; padding: 2px 5px; border-radius: 4px; font-family: monospace; color: #ffeb3b; }
 
         .guide-img {
             max-width: 100%;
@@ -126,8 +127,8 @@
 <body>
 
 <div class="card">
-    <h1 style="color:var(--primary); margin:0;">INTEGRA CHECKLIST v19</h1>
-    <span class="subtitle" style="color:#888; font-size:0.9rem;">PROFESSIONAL EDITION</span>
+    <h1 style="color:var(--primary); margin:0;">INTEGRA CHECKLIST v20</h1>
+    <span class="subtitle" style="color:#888; font-size:0.9rem;">PROFESSIONAL EDITION | JPG SUPPORT</span>
     
     <div class="row-group">
         <div class="input-group" style="flex:2;">
@@ -167,15 +168,14 @@
     // --- KONFIGURÁCIÓ ---
     const GITHUB_TEMPLATE_URL = "https://raw.githubusercontent.com/balazsnorberttt-prog/integra-checklist-files/main/DE_PCS_031_02_XXXX_SPSX_Visu%20Checkliste.xlsx";
     
-    // IDE MÁSOLD BE A KÉPEK ÚJ ÚTVONALÁT (images mappa, ékezet nélkül!)
+    // FONTOS: Images mappa, és a JPG kód lejjebb beállítva!
     const GITHUB_IMG_BASE_URL = "https://raw.githubusercontent.com/balazsnorberttt-prog/integra-checklist-files/main/images/"; 
 
     const TRANSLATE_API = "https://api.mymemory.translated.net/get";
     const photoStore = {};
 
     // --- ADATBÁZIS (HTML FORMÁZOTT LEÍRÁSOKKAL) ---
-    // A 'g' mezőben mostantól HTML kódokat használunk a szebb megjelenésért!
-    // <ul> = Lista indítása, <li> = Lista elem, <strong> = Félkövér
+    // A 'g' mezőben a G oszlop pontos adatai szerepelnek
     
     const data = [
         { cat: "1.1.0 HÁLÓZAT", items: [
@@ -199,22 +199,22 @@
             { 
                 id: "1.2.1", 
                 t: "Image Verzió aktuális?", 
-                g: "<strong>Image verzió ellenőrzése:</strong><br><br><ul><li>Melyik Image Verzió (IT Image PN) van telepítve?</li><li>Ez a verzió aktuális?</li></ul><br><em>Ellenőrzés helye: D:\\Tools\\OS-Info</em>" 
+                g: "<strong>Image verzió ellenőrzése (IT Image PN):</strong><br><br><ul><li>Melyik verzió van telepítve?</li><li>Ez a verzió aktuális?</li></ul><br><strong>Ellenőrzés helye:</strong><br><code>D:\\Tools\\OS-Info</code>" 
             },
             { 
                 id: "1.2.2", 
                 t: "TIA Portal verzió megfelelő?", 
-                g: "<strong>SIMATIC STEP7 Professional (TIA-Portal)</strong><br><br><ul><li>A verzió megfelel az aktuális előírásnak?</li></ul><br><em>Lásd: 000_B3.26.03_Projektierversion-Profinet-Komponenten_V60.xx.xls</em>" 
+                g: "<strong>SIMATIC STEP7 Professional (TIA-Portal)</strong><br><br>Verzió ellenőrzése az előírás szerint.<br><br><strong>Referencia fájl:</strong><br><code>000_B3.26.03_Projektierversion-Profinet-Komponenten_V60.xx.xls</code>" 
             },
             { 
                 id: "1.2.3", 
                 t: "Safety verzió megfelelő?", 
-                g: "<strong>SIMATIC STEP7 Safety (TIA-Portal)</strong><br><br><ul><li>A Safety verzió megfelel az előírásnak?</li></ul><br><em>Lásd: 000_B3.26.03_Projektierversion-Profinet-Komponenten_V60.xx.xls</em>" 
+                g: "<strong>SIMATIC STEP7 Safety (TIA-Portal)</strong><br><br>Verzió ellenőrzése az előírás szerint.<br><br><strong>Referencia fájl:</strong><br><code>000_B3.26.03_Projektierversion-Profinet-Komponenten_V60.xx.xls</code>" 
             },
             { 
                 id: "1.2.4", 
                 t: "Integra Designer verzió?", 
-                g: "<strong>Integra Designer</strong><br><br><ul><li>Melyik verzió van telepítve?</li><li>Megfelel ez a verzió az előírásoknak?</li></ul>" 
+                g: "<strong>Integra Designer Verzió</strong><br><br><ul><li>Melyik Integra Designer verzió van telepítve?</li><li>Megfelel ez a verzió az előírásoknak?</li></ul>" 
             }
         ]},
         { cat: "1.3.0 HARDWARE", items: [
@@ -238,14 +238,14 @@
         ]},
         { cat: "1.6.0 KIEGÉSZÍTÉSEK", items: [
             { id: "1.6.1", t: "Mintaprojektek betartva?", g: "<strong>Mintaprojektek és Előírások:</strong><br><br><ul><li>Figyelembe vették a mintaprojektek (RB, MO, FT) előírásait?</li><li>A rendelkezésre bocsátott sablonokat a megbeszélések szerint használták?</li></ul>" },
-            { id: "1.6.2", t: "Tech paraméterek jó helyen?", g: "<strong>Fájlok tárolása:</strong><br><br><ul><li>Minden technológiai paraméter / program az előírt könyvtárakban van tárolva?</li></ul><br><em>Példa: D:\\CMWProjects mappa</em>" },
+            { id: "1.6.2", t: "Tech paraméterek jó helyen?", g: "<strong>Fájlok tárolása:</strong><br><br><ul><li>Minden technológiai paraméter / program az előírt könyvtárakban van tárolva?</li></ul><br><strong>Útvonal:</strong><br><code>D:\\CMWProjects</code>" },
             { id: "1.6.3", t: "IntegraShell konfiguráció?", g: "<strong>IntegraShell:</strong><br><br><ul><li>Helyesen indul el az IntegraShell?</li><li>Minden konfiguráció megfelelő?</li></ul>" },
             { id: "1.6.4", t: "EKM kapcsolat?", g: "<strong>Hozzáférések:</strong><br><br><ul><li>Helyesen van konfigurálva a hozzáférés-védelem?</li><li>Van kapcsolat az EKM szerverhez?</li></ul>" },
             { id: "1.6.5", t: "isiSave beállítva?", g: "<strong>Archiválás (isiSave):</strong><br><br><ul><li>Helyesen van konfigurálva az archiváló szerver?</li><li>A felhasználói adatok mentésre kerülnek?</li><li>Kapcsolat: ISI-Save, ISI-Save CMW</li></ul>" },
             { id: "1.6.6", t: "Index-Szerver OK?", g: "<strong>Index-Szerver:</strong><br><br><ul><li>Helyesen van beállítva az Index-Szerver?</li></ul>" },
             { id: "1.6.7", t: "DFI-Szerver OK?", g: "<strong>DFI-Szerver:</strong><br><br><ul><li>Helyesen van beállítva a DFI-Szerver?</li></ul>" },
-            { id: "1.6.8", t: "SIS Log tiszta?", g: "<strong>SIS-Szerver Logok:</strong><br><br><ul><li>Vannak hibaüzenetek a SIS-Szerver naplófájljaiban?</li></ul><br><em>Útvonal: D:\\integra\\System\\Logs\\SisServer.csv</em>" },
-            { id: "1.6.9", t: "Mappastruktúra OK?", g: "<strong>Könyvtárszerkezet:</strong><br><br><ul><li>A struktúra az előírásoknak megfelelően lett létrehozva?</li><li>A projektek ennek megfelelően vannak tárolva?</li></ul><br><em>Pl: D:\\CMWProjects\\MO\\LFA1\\LFA1SPS1.IDPRO</em>" },
+            { id: "1.6.8", t: "SIS Log tiszta?", g: "<strong>SIS-Szerver Logok:</strong><br><br><ul><li>Vannak hibaüzenetek a SIS-Szerver naplófájljaiban?</li></ul><br><strong>Log fájl helye:</strong><br><code>D:\\integra\\System\\Logs\\SisServer.csv</code>" },
+            { id: "1.6.9", t: "Mappastruktúra OK?", g: "<strong>Könyvtárszerkezet:</strong><br><br><ul><li>A struktúra az előírásoknak megfelelően lett létrehozva?</li><li>A projektek ennek megfelelően vannak tárolva?</li></ul><br><strong>Példa útvonal:</strong><br><code>D:\\CMWProjects\\MO\\LFA1\\LFA1SPS1.IDPRO</code>" },
             { id: "1.6.10", t: "Szemét törölve?", g: "<strong>Takarítás:</strong><br><br><ul><li>Töröltek minden régi fájlt a projekt mappából?</li><li>Csak a <strong>&lt;Berendezés&gt;.S7TIA</strong> fájl lehet SPS-enként!</li></ul>" },
             { id: "1.6.11", t: "Vírusirtó frissül?", g: "<strong>Vírusvédelem:</strong><br><br><ul><li>Automatikusan frissül a vírusirtó program?</li></ul>" }
         ]},
@@ -483,7 +483,7 @@
                 <h1 class="report-title">INTEGRA JEGYZŐKÖNYV</h1>
                 <div class="report-meta">
                     Dátum: ${date}<br>
-                    Generálva: Integra Check v19
+                    Generálva: Integra Check v20
                 </div>
             </div>
 
