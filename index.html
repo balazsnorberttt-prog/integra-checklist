@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>INTEGRA AUTO-EXPORT V17</title>
+    <title>INTEGRA AUTO-EXPORT V18 - PHOTO</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 
     <style>
-        /* --- STÍLUSOK (SÖTÉT TÉMA) --- */
+        /* --- EREDETI STÍLUSOK (SÖTÉT TÉMA) --- */
         :root {
             --bg: #121212; --card: #1e1e1e; --primary: #00bcd4;
             --success: #00e676; --danger: #ff5252; --excel: #21a366; --text: #ffffff;
@@ -25,7 +25,7 @@
         .section-content { display: none; margin-top: 10px; }
         .section-content.active { display: block; }
         
-        .item-box { background: var(--card); padding: 15px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #333; position: relative; }
+        .item-box { background: var(--card); padding: 15px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #333; position: relative; transition: all 0.3s; }
         .item-box[data-status="OK"] { border-left: 6px solid var(--success); }
         .item-box[data-status="NOK"] { border-left: 6px solid var(--danger); }
         
@@ -35,6 +35,7 @@
         .btn-row { display: flex; gap: 10px; margin-top: 15px; }
         button { flex: 1; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: #fff; transition: 0.2s; }
         .btn-guide { flex: 0 0 50px; background: #333; color: var(--primary); }
+        .btn-photo { flex: 0 0 50px; background: #444; color: #fff; position: relative; } /* ÚJ GOMB */
         .btn-ok { background: #1b5e20; opacity: 0.6; }
         .btn-nok { background: #b71c1c; opacity: 0.6; }
         .btn-ok.active { background: var(--success); color: #000; opacity: 1; transform: scale(1.02); }
@@ -42,7 +43,13 @@
         
         .details { display: none; margin-top: 15px; border-top: 1px dashed #444; padding-top: 15px; }
         .guide-box { background: rgba(0,188,212,0.1); color: #ddd; padding: 12px; border-radius: 6px; margin-bottom: 15px; white-space: pre-line; border-left: 2px solid var(--primary); }
-        textarea { width: 100%; background: #111; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 6px; min-height: 60px; }
+        textarea { width: 100%; background: #111; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 6px; min-height: 60px; box-sizing: border-box; font-family: sans-serif; }
+        
+        /* --- FOTÓ MODUL --- */
+        .photo-section { display: none; margin-top: 15px; border-top: 1px solid #444; padding-top: 10px; }
+        .photo-preview { width: 100%; max-height: 200px; object-fit: contain; background: #000; border-radius: 6px; margin-bottom: 10px; display: none; }
+        .photo-input { display: none; }
+        .btn-has-photo { background: var(--primary) !important; color: #000 !important; }
         
         /* --- LEBEGŐ LÁBLÉC --- */
         .floating-footer { 
@@ -55,41 +62,85 @@
         .score { font-size: 1.5rem; color: var(--primary); font-weight: bold; }
         
         .btn-action { padding: 12px; border-radius: 8px; font-weight: bold; border: none; font-size: 0.9rem; text-transform: uppercase; width: 100%; }
-        .btn-pdf { background: #444; color: #fff; flex: 1; }
+        .btn-pdf { background: #fff; color: #000; flex: 1; }
         .btn-auto { background: linear-gradient(45deg, #21a366, #00e676); color: #000; flex: 2; box-shadow: 0 0 10px rgba(0,230,118,0.3); }
         .btn-auto:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
         .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid #000; border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite; margin-right: 5px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Print Header */
-        #print-header { display: none; }
+        /* --- MODERN PRINT LAYOUT (PDF) --- */
+        #print-container { display: none; }
+
         @media print {
-            .floating-footer, .btn-guide, .btn-row button, .input-group, .subtitle, .row-group { display: none !important; }
-            .card { border: none; padding: 0; }
-            #print-header { display: block; border-bottom: 2px solid #000; margin-bottom: 20px; }
-            .section-header { background: #eee !important; color: #000 !important; border: none !important; border-bottom: 1px solid #000 !important; }
-            .section-content { display: block !important; }
-            .item-box { border: none; border-bottom: 1px dotted #ccc; page-break-inside: avoid; color: #000; }
-            .item-box[data-status="OK"]::after { content: "✔ OK"; color: green; float: right; margin-top: -30px; font-weight: bold;}
-            .item-box[data-status="NOK"]::after { content: "✖ NOK"; color: red; float: right; margin-top: -30px; font-weight: bold;}
+            /* Minden eredeti UI elemet elrejtünk */
+            body * { visibility: hidden; }
+            .floating-footer, .card, #root, .section-header { display: none !important; }
+            body { background: #fff; color: #000; padding: 0; margin: 0; -webkit-print-color-adjust: exact; }
+            
+            /* Csak a Print Container látszik */
+            #print-container, #print-container * { visibility: visible; display: block; }
+            #print-container { 
+                position: absolute; left: 0; top: 0; width: 100%; 
+                font-family: 'Helvetica', 'Arial', sans-serif;
+            }
+
+            /* Jelentés Design */
+            .report-header { 
+                border-bottom: 2px solid #00bcd4; padding-bottom: 10px; margin-bottom: 20px; 
+                display: flex !important; justify-content: space-between; align-items: flex-end;
+            }
+            .report-title { font-size: 24px; font-weight: bold; color: #333; margin: 0; }
+            .report-meta { font-size: 12px; color: #666; text-align: right; }
+            
+            .report-summary { 
+                display: flex !important; gap: 20px; margin-bottom: 30px; 
+                background: #f0f0f0; padding: 15px; border-radius: 8px;
+            }
+            .sum-item { flex: 1; text-align: center; }
+            .sum-val { font-size: 18px; font-weight: bold; }
+            .sum-lbl { font-size: 10px; text-transform: uppercase; color: #777; }
+
+            /* A dokumentum nem eshet szét! */
+            .report-block {
+                margin-bottom: 25px;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                padding: 15px;
+                page-break-inside: avoid; /* KULCSFONTOSSÁGÚ: Nem vágja el a lap alja */
+                break-inside: avoid;
+                background: #fff;
+                box-shadow: none;
+            }
+
+            .rb-header { 
+                display: flex !important; justify-content: space-between; 
+                border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 10px;
+            }
+            .rb-id { font-weight: bold; color: #00bcd4; }
+            .rb-status { font-weight: bold; text-transform: uppercase; }
+            .rb-status.OK { color: #008000; }
+            .rb-status.NOK { color: #cc0000; }
+
+            .rb-text { font-size: 14px; margin-bottom: 5px; font-weight: bold; }
+            .rb-comment { font-size: 12px; font-style: italic; color: #555; margin-top: 5px; }
+
+            /* Fotó elrendezés a PDF-ben */
+            .rb-photo-row { 
+                display: flex !important; gap: 15px; margin-top: 10px; 
+                align-items: flex-start; 
+                border-top: 1px dotted #ccc; padding-top: 10px;
+            }
+            .rb-img { width: 140px; height: 100px; object-fit: contain; border: 1px solid #eee; background: #fafafa; }
+            .rb-desc { flex: 1; font-size: 11px; color: #333; }
+            .rb-desc-label { font-weight: bold; display: block; margin-bottom: 3px; color: #00bcd4; }
         }
     </style>
 </head>
 <body>
 
-<div id="print-header">
-    <h1>INTEGRA JEGYZŐKÖNYV</h1>
-    <div style="display:flex; justify-content:space-between;">
-        <span><strong>Gép:</strong> <span id="p-dev">-</span></span>
-        <span><strong>PLC:</strong> <span id="p-plc">-</span></span>
-        <span><strong>Ellenőr:</strong> <span id="p-op">-</span></span>
-        <span><strong>Eredmény:</strong> <span id="p-score">0%</span></span>
-    </div>
-</div>
-
 <div class="card">
-    <h1 style="color:var(--primary); margin:0;">INTEGRA CHECKLIST v17</h1>
-    <span class="subtitle" style="color:#888; font-size:0.9rem;">Vizualizáció check és Excel generáló</span>
+    <h1 style="color:var(--primary); margin:0;">INTEGRA CHECKLIST v18</h1>
+    <span class="subtitle" style="color:#888; font-size:0.9rem;">FOTÓ + PDF + EXCEL GENERÁTOR</span>
     
     <div class="row-group">
         <div class="input-group" style="flex:2;">
@@ -116,18 +167,24 @@
         <div class="score" id="scoreDisplay">0%</div>
     </div>
     <div class="footer-row">
-        <button class="btn-action btn-pdf" onclick="window.print()">📄 PDF</button>
+        <button class="btn-action btn-pdf" onclick="generateModernPDF()">📄 MODERN PDF</button>
         <button class="btn-action btn-auto" id="btnExport" onclick="startAutoExport()">
-            ☁️ FORDÍTÁS ÉS MENTÉS
+            ☁️ EXCEL MENTÉS
         </button>
     </div>
 </div>
+
+<div id="print-container">
+    </div>
 
 <script>
     // --- KONFIGURÁCIÓ ---
     const GITHUB_TEMPLATE_URL = "https://raw.githubusercontent.com/balazsnorberttt-prog/integra-checklist-files/main/DE_PCS_031_02_XXXX_SPSX_Visu%20Checkliste.xlsx";
     const TRANSLATE_API = "https://api.mymemory.translated.net/get";
     
+    // Globális tároló a fotóknak és leírásaiknak (UID alapján)
+    const photoStore = {};
+
     // --- ADATBÁZIS ---
     const data = [
         { cat: "1.1.0 HÁLÓZAT", items: [
@@ -187,7 +244,7 @@
         ]}
     ];
 
-    // --- ALAP RENDER ---
+    // --- RENDERELÉS ---
     const root = document.getElementById('root');
 
     function render() {
@@ -210,12 +267,23 @@
                         <div class="q-text">${item.t}</div>
                         <div class="btn-row">
                             <button class="btn-guide" onclick="toggleDetails('${uid}')">?</button>
+                            <button class="btn-photo" id="btn-p-${uid}" onclick="togglePhoto('${uid}')">📷</button>
                             <button class="btn-ok" onclick="setStatus('${uid}', 'OK')">OK</button>
                             <button class="btn-nok" onclick="setStatus('${uid}', 'NOK')">NOK</button>
                         </div>
+                        
                         <div class="details" id="det-${uid}">
                             <div class="guide-box">${item.g}</div>
-                            <textarea placeholder="Magyar megjegyzés..." id="com-${uid}"></textarea>
+                            <textarea placeholder="Excel Megjegyzés (Magyar)..." id="com-${uid}"></textarea>
+                        </div>
+
+                        <div class="photo-section" id="pho-${uid}">
+                            <img id="img-prev-${uid}" class="photo-preview" />
+                            <input type="file" accept="image/*" class="photo-input" id="inp-file-${uid}" onchange="savePhoto(event, '${uid}')">
+                            <button class="btn-action" style="background:#333; color:var(--primary); margin-bottom:5px;" onclick="document.getElementById('inp-file-${uid}').click()">
+                                📤 FOTÓ FELTÖLTÉSE
+                            </button>
+                            <textarea id="p-desc-${uid}" placeholder="Fotó leírása (ez kerül a PDF-be)..." oninput="savePhotoDesc('${uid}')"></textarea>
                         </div>
                     </div>
                 `;
@@ -231,41 +299,166 @@
         el.style.display = (el.style.display === 'block') ? 'none' : 'block';
     }
 
+    function togglePhoto(uid) {
+        const el = document.getElementById(`pho-${uid}`);
+        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+    }
+
+    // Fotó betöltése és tárolása Base64 formátumban
+    function savePhoto(event, uid) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64 = e.target.result;
+                // Megjelenítés
+                const img = document.getElementById(`img-prev-${uid}`);
+                img.src = base64;
+                img.style.display = 'block';
+                // Gomb színezése
+                document.getElementById(`btn-p-${uid}`).classList.add('btn-has-photo');
+                // Adattárolás
+                if(!photoStore[uid]) photoStore[uid] = {};
+                photoStore[uid].img = base64;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function savePhotoDesc(uid) {
+        const text = document.getElementById(`p-desc-${uid}`).value;
+        if(!photoStore[uid]) photoStore[uid] = {};
+        photoStore[uid].desc = text;
+    }
+
     function setStatus(uid, s) {
         const box = document.getElementById(`box-${uid}`);
         const btns = box.querySelectorAll('.btn-row button');
-        btns[1].classList.remove('active');
+        // Reset OK/NOK buttons (indicies: 2=OK, 3=NOK due to inserted Photo btn)
         btns[2].classList.remove('active');
+        btns[3].classList.remove('active');
+        
         box.setAttribute('data-status', s);
 
-        if(s === 'OK') { btns[1].classList.add('active'); } 
-        else { btns[2].classList.add('active'); document.getElementById(`det-${uid}`).style.display = 'block'; }
+        if(s === 'OK') { btns[2].classList.add('active'); } 
+        else { btns[3].classList.add('active'); document.getElementById(`det-${uid}`).style.display = 'block'; }
         calc();
     }
 
     function calc() {
         const all = document.querySelectorAll('.item-box').length;
         const ok = document.querySelectorAll('.item-box[data-status="OK"]').length;
-        const pct = Math.round((ok/all)*100);
+        const pct = all > 0 ? Math.round((ok/all)*100) : 0;
         document.getElementById('scoreDisplay').innerText = pct + "%";
-        document.getElementById('p-score').innerText = pct + "%";
     }
 
     function syncData() {
-        document.getElementById('p-dev').innerText = document.getElementById('devName').value;
-        document.getElementById('p-plc').innerText = document.getElementById('plcNum').value;
-        document.getElementById('p-op').innerText = document.getElementById('opName').value;
+        // Csak a placeholder miatt van itt
     }
 
-    // --- JAVÍTOTT FORDÍTÁS LOGIKA (MT FORCE) ---
+    // --- MODERN PDF GENERÁLÁS (ÚJ FUNKCIÓ) ---
+    function generateModernPDF() {
+        const dev = document.getElementById('devName').value || "Nincs megadva";
+        const plc = document.getElementById('plcNum').value || "-";
+        const op = document.getElementById('opName').value || "-";
+        const score = document.getElementById('scoreDisplay').innerText;
+        const date = new Date().toLocaleDateString('hu-HU');
+
+        // 1. Összegyűjtjük a kitöltött adatokat
+        let contentHtml = "";
+        const allItems = document.querySelectorAll('.item-box');
+
+        allItems.forEach(box => {
+            const uid = box.id.replace('box-', '');
+            const idTag = box.querySelector('.id-tag').innerText;
+            const text = box.querySelector('.q-text').innerText;
+            const status = box.getAttribute('data-status');
+            const comment = document.getElementById(`com-${uid}`).value;
+            
+            // Ha nincs státusz, ne kerüljön a PDF-be (vagy kerüljön "Kitöltetlen"-ként? Itt most kihagyjuk)
+            if (!status) return; 
+
+            // Fotó adat
+            const photoData = photoStore[uid];
+            let photoHtml = "";
+            if (photoData && photoData.img) {
+                photoHtml = `
+                    <div class="rb-photo-row">
+                        <img src="${photoData.img}" class="rb-img">
+                        <div class="rb-desc">
+                            <span class="rb-desc-label">FOTÓ LEÍRÁS:</span>
+                            ${photoData.desc || "Nincs leírás megadva."}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Blokk felépítése
+            contentHtml += `
+                <div class="report-block">
+                    <div class="rb-header">
+                        <span class="rb-id">${idTag}</span>
+                        <span class="rb-status ${status}">${status}</span>
+                    </div>
+                    <div class="rb-text">${text}</div>
+                    ${comment ? `<div class="rb-comment">Megjegyzés: ${comment}</div>` : ''}
+                    ${photoHtml}
+                </div>
+            `;
+        });
+
+        if(contentHtml === "") contentHtml = "<p style='text-align:center; padding:20px;'>Nincs kiértékelt adat.</p>";
+
+        // 2. A rejtett tároló feltöltése
+        const container = document.getElementById('print-container');
+        container.innerHTML = `
+            <div class="report-header">
+                <h1 class="report-title">INTEGRA JEGYZŐKÖNYV</h1>
+                <div class="report-meta">
+                    Dátum: ${date}<br>
+                    Generálva: Integra Check v18
+                </div>
+            </div>
+
+            <div class="report-summary">
+                <div class="sum-item">
+                    <div class="sum-val">${dev}</div>
+                    <div class="sum-lbl">Berendezés</div>
+                </div>
+                <div class="sum-item">
+                    <div class="sum-val">SPS ${plc}</div>
+                    <div class="sum-lbl">PLC</div>
+                </div>
+                <div class="sum-item">
+                    <div class="sum-val">${op}</div>
+                    <div class="sum-lbl">Ellenőr</div>
+                </div>
+                <div class="sum-item">
+                    <div class="sum-val" style="color:${parseInt(score) === 100 ? 'green' : 'red'}">${score}</div>
+                    <div class="sum-lbl">Eredmény</div>
+                </div>
+            </div>
+
+            <div class="report-body">
+                ${contentHtml}
+            </div>
+        `;
+
+        // 3. Nyomtatás indítása
+        window.print();
+    }
+
+
+    // --- EXCEL EXPORT (VÁLTOZATLAN) ---
+    // A kommentek és státuszok kezelése ugyanaz maradt, a fotókat az Excelbe 
+    // direkt nem tettük bele, ahogy kérted, hogy a kód ne sérüljön.
+    
     async function translateText(text) {
         if (!text || text.trim() === "") return "";
         try {
-            // &mt=1 KÉNYSZERÍTI a gépi fordítást, ha nincs emberi találat (Kevesebb angol hiba)
             const url = `${TRANSLATE_API}?q=${encodeURIComponent(text)}&langpair=hu|de&mt=1`;
             const res = await fetch(url);
             const json = await res.json();
-            
             if (json.responseData && json.responseData.translatedText) {
                 return json.responseData.translatedText;
             }
@@ -276,7 +469,6 @@
         }
     }
 
-    // --- EXPORT FOLYAMAT ---
     async function startAutoExport() {
         const devName = document.getElementById('devName').value;
         const plcNum = document.getElementById('plcNum').value;
@@ -300,8 +492,6 @@
 
             const workbook = new ExcelJS.Workbook();
             await workbook.xlsx.load(buffer);
-
-            // --- JAVÍTÁS: KÉPLETEK ÚJRASZÁMOLÁSA ---
             workbook.calcProperties.fullCalcOnLoad = true;
 
             const allItems = document.querySelectorAll('.item-box');
@@ -345,7 +535,6 @@
 
                         if (stat === "OK") {
                             cellC.value = "x";
-                            // JAVÍTÁS: Szövegként mentjük, hogy a COUNTIF felismerje
                             cellC.type = ExcelJS.ValueType.String; 
                             cellC.alignment = { horizontal: 'center' };
                         } else if (stat === "NOK") {
@@ -387,7 +576,7 @@
             status.innerText = "Hiba";
         } finally {
             btn.disabled = false;
-            btn.innerHTML = '☁️ FORDÍTÁS ÉS MENTÉS';
+            btn.innerHTML = '☁️ EXCEL MENTÉS';
         }
     }
 
@@ -396,5 +585,3 @@
 
 </body>
 </html>
-
-
